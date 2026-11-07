@@ -1,7 +1,7 @@
 {
   "name": "Kezu",
   "short_name": "Kezu",
-  "description": "Hamburg'u oyunlaştırarak keşfet",
+  "description": "Avrupa'yı oyunlaştırarak keşfet",
   "lang": "tr",
   "start_url": "./",
   "scope": "./",
