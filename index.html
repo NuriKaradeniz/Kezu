@@ -179,6 +179,26 @@ textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px
 .leaflet-tooltip.lock-label::before{display:none}
 .map-msg{position:absolute;inset:0;display:grid;place-items:center;padding:30px;text-align:center;color:var(--muted)}
 
+/* passport / cities */
+.cities{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:2px 16px 4px}
+.cities::-webkit-scrollbar{display:none}
+.city{flex:none;width:122px;border:2px solid var(--line);background:var(--surface);border-radius:16px;padding:10px;display:grid;gap:3px;text-align:left;cursor:pointer;position:relative}
+.city .flag{font-size:1.7rem;line-height:1.1}
+.city b{font-size:.95rem;line-height:1.2}
+.city .s{font-size:.7rem;color:var(--muted);font-family:var(--f-mono)}
+.city .track{margin-top:3px}
+.city .track i{background:var(--cc)}
+.city[aria-pressed="true"]{border-color:var(--cc);box-shadow:0 0 0 3px color-mix(in srgb,var(--cc) 25%,transparent)}
+.city.locked .flag{filter:grayscale(1);opacity:.45}
+.city.locked b{color:var(--muted)}
+.city .stampmark{position:absolute;right:8px;top:8px;font-size:.95rem}
+.cityinfo{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--cc);border-radius:16px;padding:14px;display:grid;gap:8px}
+.cityinfo h3{font-family:var(--f-display);font-size:1.15rem;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.cityinfo p{margin:0;font-size:.88rem}
+.cityinfo .travel{font-size:.8rem;color:var(--muted)}
+.lockbox{border:2px dashed var(--line);border-radius:14px;padding:12px;display:grid;gap:8px;background:var(--bg)}
+.flagtag{font-size:.9em;margin-right:2px}
+
 /* calendar */
 .ev{display:grid;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;text-align:left;width:100%}
 .ev .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
@@ -243,7 +263,7 @@ header .lvl-chip{flex:none}
 <body>
 <div class="wrap" id="app">
   <header>
-    <div class="brandrow"><svg class="crest" viewBox="34 24 332 394" aria-hidden="true"><defs><clipPath id="kzin"><path d="M56 46 H344 V228 C344 310 288 362 200 394 C112 362 56 310 56 228 Z"/></clipPath><clipPath id="kzctl"><rect x="56" y="46" width="139" height="167"/></clipPath><clipPath id="kzctr"><rect x="205" y="46" width="139" height="167"/></clipPath><clipPath id="kzcbl"><rect x="56" y="223" width="139" height="180"/></clipPath><clipPath id="kzcbr"><rect x="205" y="223" width="139" height="180"/></clipPath></defs><path d="M40 30 H360 V228 C360 320 296 378 200 412 C104 378 40 320 40 228 Z" fill="#f4ecdf" stroke="#1b2a41" stroke-width="12" stroke-linejoin="round"/><g clip-path="url(#kzin)"><g clip-path="url(#kzctl)"><rect x="56" y="46" width="139" height="167" fill="#c4573a"/><circle cx="158" cy="80" r="17" fill="#e3a13a"/><path d="M84 76 l6 5 l6 -5 M100 66 l5 4 l5 -4" stroke="#f4ecdf" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path fill-rule="evenodd" fill="#f4ecdf" d="M44 112 H206 V190 H44 ZM52 136 V124 A7 7 0 0 1 66 124 V136 ZM72 136 V124 A7 7 0 0 1 86 124 V136 ZM92 136 V124 A7 7 0 0 1 106 124 V136 ZM112 136 V124 A7 7 0 0 1 126 124 V136 ZM132 136 V124 A7 7 0 0 1 146 124 V136 ZM152 136 V124 A7 7 0 0 1 166 124 V136 ZM172 136 V124 A7 7 0 0 1 186 124 V136 ZM192 136 V124 A7 7 0 0 1 206 124 V136 ZM52 190 V160 A13 13 0 0 1 78 160 V190 ZM90 190 V160 A13 13 0 0 1 116 160 V190 ZM128 190 V160 A13 13 0 0 1 154 160 V190 ZM166 190 V160 A13 13 0 0 1 192 160 V190 Z"/><path d="M44 140 H206" stroke="#c4573a" stroke-width="2" opacity=".35"/><rect x="44" y="190" width="162" height="30" fill="#1b2a41"/></g><g clip-path="url(#kzctr)"><rect x="205" y="46" width="139" height="167" fill="#22395a"/><g transform="translate(275 155) scale(.78) translate(-275 -132)"><path d="M238 86 c-7 -8 7 -12 0 -20 c-7 -8 7 -12 0 -20 M252 82 c-6 -7 6 -10 0 -17" stroke="#f4ecdf" stroke-width="4" fill="none" stroke-linecap="round" opacity=".85"/><path d="M302 104 C326 102 328 136 300 140" stroke="#f4ecdf" stroke-width="8" fill="none" stroke-linecap="round"/><circle cx="275" cy="80" r="5.5" fill="#f4ecdf"/><path d="M250 86 H300 L306 96 H244 Z" fill="#f4ecdf"/><path d="M244 96 H306 L295 142 H255 Z M244 96 L232 100 L246 106 Z" fill="#f4ecdf"/><rect x="251" y="142" width="48" height="9" fill="#e3a13a"/><path d="M254 151 H296 L304 196 H246 Z" fill="#f4ecdf"/><path d="M266 142 L262 96 M284 142 L288 96 M266 151 L263 196 M284 151 L287 196" stroke="#22395a" stroke-width="2.5" opacity=".28"/></g><rect x="196" y="205" width="160" height="12" fill="#1b2a41"/></g><g clip-path="url(#kzcbl)"><rect x="56" y="223" width="139" height="180" fill="#e3a13a"/><path d="M125.0 276.0L148.0 276.0M123.5 281.5L134.8 288.0M119.5 285.5L131.0 305.4M114.0 287.0L114.0 300.0M108.5 285.5L97.0 305.4M104.5 281.5L93.2 288.0M103.0 276.0L80.0 276.0M104.5 270.5L93.2 264.0M108.5 266.5L97.0 246.6M114.0 265.0L114.0 252.0M119.5 266.5L131.0 246.6M123.5 270.5L134.8 264.0" stroke="#f4ecdf" stroke-width="6" stroke-linecap="round" fill="none"/><circle cx="114" cy="276" r="5" fill="#f4ecdf"/><path d="M170.5 252.7L181.6 257.3M166.7 256.5L171.3 267.6M161.3 256.5L156.7 267.6M157.5 252.7L146.4 257.3M157.5 247.3L146.4 242.7M161.3 243.5L156.7 232.4M166.7 243.5L171.3 232.4M170.5 247.3L181.6 242.7" stroke="#c4573a" stroke-width="4" stroke-linecap="round" fill="none"/><circle cx="164" cy="250" r="3" fill="#c4573a"/><path d="M84.0 244.0L90.0 244.0M82.8 246.8L87.1 251.1M80.0 248.0L80.0 254.0M77.2 246.8L72.9 251.1M76.0 244.0L70.0 244.0M77.2 241.2L72.9 236.9M80.0 240.0L80.0 234.0M82.8 241.2L87.1 236.9" stroke="#1b2a41" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M44 352 L66 352 L66 338 L76 328 L86 338 L86 346 L98 346 L98 324 L104 312 L110 324 L110 348 L126 348 L126 334 L144 334 L144 342 L160 342 L160 330 L170 320 L180 330 L180 352 L206 352 V420 H44 Z" fill="#1b2a41"/></g><g clip-path="url(#kzcbr)"><rect x="205" y="223" width="139" height="180" fill="#2a8c82"/><circle cx="236" cy="256" r="10" fill="#f4ecdf" opacity=".9"/><path d="M248 420 L314 262 L380 420 Z" fill="#1b2a41"/><path d="M314 262 L328 296 L318 290 L310 298 L300 292 Z" fill="#f4ecdf"/><path d="M190 420 L262 282 L334 420 Z" fill="#f4ecdf"/><path d="M262 282 V256" stroke="#1b2a41" stroke-width="3.5" stroke-linecap="round"/><path d="M262 256 L282 263 L262 270 Z" fill="#c4573a"/><path d="M250 404 C282 388 236 372 262 352 C280 338 250 324 262 300" stroke="#2a8c82" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="7 9"/></g></g></svg><div class="brand">Kezu<small>Hallo! · Entdecke Europa</small></div></div>
+    <div class="brandrow"><svg class="crest" viewBox="34 24 332 394" aria-hidden="true"><defs><clipPath id="kzin"><path d="M56 46 H344 V228 C344 310 288 362 200 394 C112 362 56 310 56 228 Z"/></clipPath><clipPath id="kzctl"><rect x="56" y="46" width="139" height="167"/></clipPath><clipPath id="kzctr"><rect x="205" y="46" width="139" height="167"/></clipPath><clipPath id="kzcbl"><rect x="56" y="223" width="139" height="180"/></clipPath><clipPath id="kzcbr"><rect x="205" y="223" width="139" height="180"/></clipPath></defs><path d="M40 30 H360 V228 C360 320 296 378 200 412 C104 378 40 320 40 228 Z" fill="#f4ecdf" stroke="#1b2a41" stroke-width="12" stroke-linejoin="round"/><g clip-path="url(#kzin)"><g clip-path="url(#kzctl)"><rect x="56" y="46" width="139" height="167" fill="#c4573a"/><circle cx="158" cy="80" r="17" fill="#e3a13a"/><path d="M84 76 l6 5 l6 -5 M100 66 l5 4 l5 -4" stroke="#f4ecdf" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path fill-rule="evenodd" fill="#f4ecdf" d="M44 112 H206 V190 H44 ZM52 136 V124 A7 7 0 0 1 66 124 V136 ZM72 136 V124 A7 7 0 0 1 86 124 V136 ZM92 136 V124 A7 7 0 0 1 106 124 V136 ZM112 136 V124 A7 7 0 0 1 126 124 V136 ZM132 136 V124 A7 7 0 0 1 146 124 V136 ZM152 136 V124 A7 7 0 0 1 166 124 V136 ZM172 136 V124 A7 7 0 0 1 186 124 V136 ZM192 136 V124 A7 7 0 0 1 206 124 V136 ZM52 190 V160 A13 13 0 0 1 78 160 V190 ZM90 190 V160 A13 13 0 0 1 116 160 V190 ZM128 190 V160 A13 13 0 0 1 154 160 V190 ZM166 190 V160 A13 13 0 0 1 192 160 V190 Z"/><path d="M44 140 H206" stroke="#c4573a" stroke-width="2" opacity=".35"/><rect x="44" y="190" width="162" height="30" fill="#1b2a41"/></g><g clip-path="url(#kzctr)"><rect x="205" y="46" width="139" height="167" fill="#22395a"/><g transform="translate(275 155) scale(.78) translate(-275 -132)"><path d="M238 86 c-7 -8 7 -12 0 -20 c-7 -8 7 -12 0 -20 M252 82 c-6 -7 6 -10 0 -17" stroke="#f4ecdf" stroke-width="4" fill="none" stroke-linecap="round" opacity=".85"/><path d="M302 104 C326 102 328 136 300 140" stroke="#f4ecdf" stroke-width="8" fill="none" stroke-linecap="round"/><circle cx="275" cy="80" r="5.5" fill="#f4ecdf"/><path d="M250 86 H300 L306 96 H244 Z" fill="#f4ecdf"/><path d="M244 96 H306 L295 142 H255 Z M244 96 L232 100 L246 106 Z" fill="#f4ecdf"/><rect x="251" y="142" width="48" height="9" fill="#e3a13a"/><path d="M254 151 H296 L304 196 H246 Z" fill="#f4ecdf"/><path d="M266 142 L262 96 M284 142 L288 96 M266 151 L263 196 M284 151 L287 196" stroke="#22395a" stroke-width="2.5" opacity=".28"/></g><rect x="196" y="205" width="160" height="12" fill="#1b2a41"/></g><g clip-path="url(#kzcbl)"><rect x="56" y="223" width="139" height="180" fill="#e3a13a"/><path d="M125.0 276.0L148.0 276.0M123.5 281.5L134.8 288.0M119.5 285.5L131.0 305.4M114.0 287.0L114.0 300.0M108.5 285.5L97.0 305.4M104.5 281.5L93.2 288.0M103.0 276.0L80.0 276.0M104.5 270.5L93.2 264.0M108.5 266.5L97.0 246.6M114.0 265.0L114.0 252.0M119.5 266.5L131.0 246.6M123.5 270.5L134.8 264.0" stroke="#f4ecdf" stroke-width="6" stroke-linecap="round" fill="none"/><circle cx="114" cy="276" r="5" fill="#f4ecdf"/><path d="M170.5 252.7L181.6 257.3M166.7 256.5L171.3 267.6M161.3 256.5L156.7 267.6M157.5 252.7L146.4 257.3M157.5 247.3L146.4 242.7M161.3 243.5L156.7 232.4M166.7 243.5L171.3 232.4M170.5 247.3L181.6 242.7" stroke="#c4573a" stroke-width="4" stroke-linecap="round" fill="none"/><circle cx="164" cy="250" r="3" fill="#c4573a"/><path d="M84.0 244.0L90.0 244.0M82.8 246.8L87.1 251.1M80.0 248.0L80.0 254.0M77.2 246.8L72.9 251.1M76.0 244.0L70.0 244.0M77.2 241.2L72.9 236.9M80.0 240.0L80.0 234.0M82.8 241.2L87.1 236.9" stroke="#1b2a41" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M44 352 L66 352 L66 338 L76 328 L86 338 L86 346 L98 346 L98 324 L104 312 L110 324 L110 348 L126 348 L126 334 L144 334 L144 342 L160 342 L160 330 L170 320 L180 330 L180 352 L206 352 V420 H44 Z" fill="#1b2a41"/></g><g clip-path="url(#kzcbr)"><rect x="205" y="223" width="139" height="180" fill="#2a8c82"/><circle cx="236" cy="256" r="10" fill="#f4ecdf" opacity=".9"/><path d="M248 420 L314 262 L380 420 Z" fill="#1b2a41"/><path d="M314 262 L328 296 L318 290 L310 298 L300 292 Z" fill="#f4ecdf"/><path d="M190 420 L262 282 L334 420 Z" fill="#f4ecdf"/><path d="M262 282 V256" stroke="#1b2a41" stroke-width="3.5" stroke-linecap="round"/><path d="M262 256 L282 263 L262 270 Z" fill="#c4573a"/><path d="M250 404 C282 388 236 372 262 352 C280 338 250 324 262 300" stroke="#2a8c82" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="7 9"/></g></g></svg><div class="brand">Kezu<small id="greet">Moin! · Entdecke Europa</small></div></div>
     <button class="lvl-chip" id="lvlChip" type="button"></button>
   </header>
 
@@ -253,8 +273,14 @@ header .lvl-chip{flex:none}
       <div class="player" id="player"></div>
       <div id="daily"></div>
       <div style="display:grid;gap:8px">
-        <h2>Bölgeler <span class="de">Stadtteile</span></h2>
-        <p class="small muted" style="margin:0">Görev yaptıkça XP kazan, XP biriktikçe yeni bölgeler açılır.</p>
+        <h2>Pasaportum <span class="de">Reisepass</span></h2>
+        <p class="small muted" style="margin:0">Yeni şehirler toplam XP ile açılır — ya da oraya gidip pasaport damgası basarsın.</p>
+      </div>
+      <div class="cities" id="cities"></div>
+      <div id="cityInfo"></div>
+      <div style="display:grid;gap:8px">
+        <h2 id="regTitle">Bölgeler</h2>
+        <p class="small muted" style="margin:0">Bu şehirde görev yaptıkça XP kazan, XP biriktikçe yeni bölgeler açılır.</p>
       </div>
       <div class="regions" id="regions"></div>
       <div class="card">
@@ -269,13 +295,14 @@ header .lvl-chip{flex:none}
   <!-- TAKVİM -->
   <section id="tab-takvim" class="tab" hidden style="display:grid;gap:16px">
     <h2>Takvim <span class="de">Veranstaltungen</span></h2>
+    <div class="chips" id="calChips"></div>
     <div class="card">
       <h3>Her hafta <span class="de">Jede Woche</span></h3>
       <div class="weekly" id="weekly"></div>
     </div>
     <div style="display:grid;gap:8px" id="evNow"></div>
     <div style="display:grid;gap:8px" id="evNext"></div>
-    <p class="small muted">Tarihler 2026/27 için hamburg.de ve resmi sitelerden alındı; "her yıl" yazanların kesin gününü gitmeden kontrol et. Etkinlikler bölge kilidi olmadan her zaman açık — kaçırma!</p>
+    <p class="small muted">Tarihler 2026/27 için resmi sitelerden ve şehir rehberlerinden alındı; "her yıl" yazanların kesin gününü gitmeden kontrol et. Etkinlikler kilitsiz — şehir henüz açılmamış olsa bile gidip XP kazanabilirsin.</p>
   </section>
 
   <!-- ROZETLER -->
@@ -287,8 +314,8 @@ header .lvl-chip{flex:none}
       <div class="levels" id="levels"></div>
     </div>
     <div class="card">
-      <h2>Almanca defterim <span class="de">Mein Wortschatz</span></h2>
-      <p class="small muted" style="margin:0">Her bitirdiğin görevin cümlesi buraya eklenir. Ezber modunda Türkçesini görmek için cümleye dokun.</p>
+      <h2>Dil defterim <span class="de">Wortschatz · Ordforråd · Woordenschat</span></h2>
+      <p class="small muted" style="margin:0">Her bitirdiğin görevin cümlesi o şehrin dilinde buraya eklenir. Dokununca okunur; ezber modunda Türkçesini görmek için dokun.</p>
       <div class="row"><button class="btn sm" id="quizBtn" type="button">🧠 Ezber modu</button><span class="small muted" id="wordCount"></span></div>
       <div class="words" id="words"></div>
     </div>
@@ -321,7 +348,7 @@ header .lvl-chip{flex:none}
   <div id="map"></div>
   <div class="map-ctrl">
     <button type="button" id="locBtn" aria-label="Konumum">📍</button>
-    <button type="button" id="fitBtn" aria-label="Tüm Hamburg">🗺️</button>
+    <button type="button" id="fitBtn" aria-label="Şehrin tamamı">🗺️</button>
   </div>
   <div class="map-legend" id="legend"></div>
 </div>
@@ -334,6 +361,7 @@ header .lvl-chip{flex:none}
 </nav>
 
 <script src="data.js"></script>
+<script src="cities.js"></script>
 <script>
 /* ---------- helpers ---------- */
 const $=id=>document.getElementById(id);
@@ -349,7 +377,10 @@ const regById=Object.fromEntries(REGIONS.map(r=>[r.id,r]));
 const qById=Object.fromEntries(QUESTS.map(q=>[q.id,q]));
 const evById=Object.fromEntries(EVENTS.map(e=>[e.id,e]));
 const itemById=id=>qById[id]||evById[id];
-const BONUS={gps:10,vlog:5,daily:15}, CUSTOM_XP=15;
+const cityById=Object.fromEntries(CITIES.map(c=>[c.id,c]));
+const cityIdOf=it=>it?(it.city||regById[it.r]?.city||"hamburg"):"hamburg";
+const cityOf=it=>cityById[cityIdOf(it)];
+const BONUS={gps:10,vlog:5,daily:15}, CUSTOM_XP=15, STAMP_XP=30, STAMP_RADIUS=30000;
 
 function haversine(a,b){const R=6371000,t=x=>x*Math.PI/180;const dLa=t(b[0]-a[0]),dLo=t(b[1]-a[1]);
   const h=Math.sin(dLa/2)**2+Math.cos(t(a[0]))*Math.cos(t(b[0]))*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
@@ -358,15 +389,26 @@ function toast(msg,ms=2600){const t=document.createElement("div");t.className="t
 
 /* ---------- state ---------- */
 const KEY="hh-kesif-v1";
-function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.done)return {custom:[],seenRegions:[],seenLevel:0,...s}}catch{}return {done:{},custom:[],seenRegions:[],seenLevel:0}}
+const FRESH=()=>({done:{},custom:[],seenRegions:[],seenLevel:0,stamps:{},city:"hamburg"});
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.done)return {...FRESH(),...s}}catch{}return FRESH()}
 let S=load();
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}}
+let _cx=null; // per-city XP cache, cleared on every save
+function save(){_cx=null;try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}}
 let here=null; // last known position [lat,lng]
 
 const recXp=(id,r)=>{const it=itemById(id);if(!it)return 0;return it.xp+(r.gps?BONUS.gps:0)+(r.vlog?BONUS.vlog:0)+(r.daily?BONUS.daily:0)};
-function totalXp(){let x=0;for(const [id,r] of Object.entries(S.done))x+=recXp(id,r);return x+S.custom.length*CUSTOM_XP}
+function cityXpMap(){
+  if(_cx)return _cx;const m={};CITIES.forEach(c=>m[c.id]=S.stamps[c.id]?STAMP_XP:0);
+  for(const [id,r] of Object.entries(S.done)){const it=itemById(id);if(it)m[cityIdOf(it)]=(m[cityIdOf(it)]||0)+recXp(id,r)}
+  S.custom.forEach(c=>{const k=c.city||"hamburg";m[k]=(m[k]||0)+CUSTOM_XP});
+  return _cx=m}
+function totalXp(){return Object.values(cityXpMap()).reduce((a,b)=>a+b,0)}
+const cityXp=cid=>cityXpMap()[cid]||0;
 function levelOf(xp){let i=0;LEVELS.forEach((l,k)=>{if(xp>=l.xp)i=k});return i}
-const unlocked=(r,xp=totalXp())=>xp>=r.xp;
+const cityOpen=c=>!!S.stamps[c.id]||totalXp()>=c.xp;
+const unlocked=r=>cityOpen(cityById[r.city])&&cityXp(r.city)>=r.xp;
+const curCity=()=>cityById[S.city]||CITIES[0];
+const openCity=()=>{const c=curCity();return cityOpen(c)?c:CITIES[0]};
 const regQuests=rid=>QUESTS.filter(q=>q.r===rid);
 const isDone=id=>!!S.done[id];
 
@@ -390,19 +432,22 @@ function stats(){
     words:items.filter(i=>i.ph).length,
     region:REGIONS.filter(r=>{const qs=regQuests(r.id);return qs.length&&qs.every(q=>isDone(q.id))}).length,
     streak:streak(),
-    trips:done.filter(id=>qById[id]?.r==="ausflug").length,
-    allregions:REGIONS.filter(r=>unlocked(r,xp)).length};
+    trips:done.filter(id=>regById[qById[id]?.r]?.trip).length,
+    allcities:CITIES.filter(cityOpen).length,
+    stamps:Object.keys(S.stamps).length,
+    langs:new Set(items.filter(i=>i.ph).map(i=>cityOf(i).lang.slice(0,2))).size,
+    kreuzberg:items.filter(i=>i.r==="b-kreuzberg"&&i.t==="ye").length};
 }
 function badgeProgress(b,st){const v=b.tag?(st.tag[b.tag]||0):st[b.special];return [Math.min(v,b.goal),b.goal]}
 
 /* daily quest: deterministic pick per day among open, unfinished city quests */
 function dailyQuest(){
-  const xp=totalXp(),d=today();
-  if(S.dailyPick&&S.dailyPick.d===d&&qById[S.dailyPick.id])return qById[S.dailyPick.id];
-  const pool=QUESTS.filter(q=>q.r!=="ausflug"&&unlocked(regById[q.r],xp)&&!isDone(q.id)&&(!q.months||q.months.includes(new Date().getMonth()+1)));
+  const d=today(),cid=openCity().id;
+  if(S.dailyPick&&S.dailyPick.d===d&&(S.dailyPick.c||"hamburg")===cid&&qById[S.dailyPick.id])return qById[S.dailyPick.id];
+  const pool=QUESTS.filter(q=>{const r=regById[q.r];return r.city===cid&&!r.trip&&unlocked(r)&&!isDone(q.id)&&(!q.months||q.months.includes(new Date().getMonth()+1))});
   if(!pool.length)return null;
-  let h=0;for(const c of d)h=(h*31+c.charCodeAt(0))>>>0;
-  const q=pool[h%pool.length];S.dailyPick={d,id:q.id};save();return q;
+  let h=0;for(const c of d+cid)h=(h*31+c.charCodeAt(0))>>>0;
+  const q=pool[h%pool.length];S.dailyPick={d,c:cid,id:q.id};save();return q;
 }
 
 /* ---------- render: home ---------- */
@@ -420,11 +465,12 @@ function renderPlayer(){
     <div class="xptext num"><span>${xp} XP</span><span>${N?`${N.n} için ${N.xp-xp} XP`:"Zirvedesin 👑"}</span></div>
     <div class="pstats num">
       <div><b>${nDone}</b><span>keşif</span></div>
-      <div><b>${st.allregions}/${REGIONS.length}</b><span>bölge</span></div>
+      <div><b>${st.allcities}/${CITIES.length}</b><span>şehir</span></div>
       <div><b>${BADGES.filter(b=>{const [v,g]=badgeProgress(b,st);return v>=g}).length}</b><span>rozet</span></div>
       <div><b>${st.streak}🔥</b><span>hafta seri</span></div>
     </div>`;
   $("lvlChip").textContent=`Lv ${li+1} · ${xp} XP`;
+  $("greet").textContent=`${openCity().hi} · Entdecke Europa`;
 }
 function renderDaily(){
   const q=dailyQuest(),box=$("daily");
@@ -433,14 +479,49 @@ function renderDaily(){
   box.innerHTML=`<div class="daily${rec?" done":""}" role="button" tabindex="0">
     <span class="tag">⭐ Günün görevi · bugün yaparsan +${BONUS.daily} XP</span>
     <div class="t">${TYPE[q.t].e} ${esc(q.n)}</div>
-    <div class="small muted">${esc(r.n)} · ${q.xp} XP${rec?" · ✅ tamamlandı":""}</div></div>`;
+    <div class="small muted">${cityOf(q).flag} ${esc(r.n)} · ${q.xp} XP${rec?" · ✅ tamamlandı":""}</div></div>`;
   box.firstElementChild.onclick=()=>openItem(q.id);
 }
+function cityQuests(cid){return QUESTS.filter(q=>regById[q.r].city===cid)}
+function renderCities(){
+  const xp=totalXp(),cur=curCity();
+  $("cities").innerHTML=CITIES.map(c=>{
+    const qs=cityQuests(c.id),dn=qs.filter(q=>isDone(q.id)).length,open=cityOpen(c);
+    return `<button class="city${open?"":" locked"}" style="--cc:${c.c}" aria-pressed="${c.id===cur.id}" data-c="${c.id}">
+      ${S.stamps[c.id]?'<span class="stampmark" title="Damgalı">🛂</span>':""}
+      <span class="flag">${c.flag}</span><b>${esc(c.n)}</b>
+      <span class="s num">${open?`${dn}/${qs.length} görev`:`🔒 ${c.xp} XP`}</span>
+      <div class="track"><i style="width:${open?Math.round(dn/qs.length*100):Math.min(100,Math.round(xp/c.xp*100))}%"></i></div></button>`}).join("");
+  $("cities").querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{S.city=b.dataset.c;save();mood="all";calCity=null;renderHome();if(map)map.setView(curCity().ll,curCity().z)});
+  const open=cityOpen(cur),stamped=S.stamps[cur.id];
+  $("cityInfo").innerHTML=`<div class="cityinfo" style="--cc:${cur.c}">
+    <h3>${cur.flag} ${esc(cur.n)} <span class="de">${esc(cur.country)} · ${esc(cur.langTr)}</span></h3>
+    <p>${esc(cur.d)}</p>
+    <p class="travel">🚆 ${esc(cur.travel)}</p>
+    ${open?"":`<div class="lockbox"><b>🔒 ${cur.xp} XP'de açılır — ${Math.max(0,cur.xp-xp)} XP kaldı</b>
+      <span class="small muted">Beklemek istemiyor musun? ${esc(cur.n)}'e git, oradayken damga bas: şehir hemen açılır.</span></div>`}
+    ${stamped?`<span class="small">🛂 Pasaport damgası: ${fmtDate(stamped)} ${stamped.slice(0,4)}</span>`
+      :`<button class="btn sm${open?"":" primary"}" id="stampBtn" type="button" style="justify-self:start">🛂 Buradayım — damga bas (+${STAMP_XP} XP)</button>`}
+  </div>`;
+  $("stampBtn")&&($("stampBtn").onclick=()=>stampCity(cur.id));
+}
+function stampCity(cid){
+  const c=cityById[cid],btn=$("stampBtn");if(btn){btn.disabled=true;btn.textContent="Konum alınıyor…"}
+  locate(pos=>{
+    const d=haversine(pos,c.ll);
+    if(d>STAMP_RADIUS){toast(`${c.n} merkezine ${fmtDist(d)} uzaktasın. Damga için şehirde olman lazım.`,3600);renderCities();return}
+    const before=snapshot();S.stamps[cid]=today();S.city=cid;save();
+    celebrate(null,before,{big:"🛂",h:`${c.n} damgalandı!`});renderAll();
+  },false,m=>{toast(m);renderCities()});
+}
 function renderRegions(){
-  const xp=totalXp();let nextShown=false;
-  $("regions").innerHTML=REGIONS.map(r=>{
+  const xp=totalXp(),cur=curCity();let nextShown=false;
+  $("regTitle").innerHTML=`Bölgeler · ${esc(cur.n)} <span class="de">${cur.flag}</span>`;
+  if(!cityOpen(cur)){$("regions").innerHTML=`<div class="region locked" style="--rc:${cur.c}"><div class="top"><span class="nm">🔒 ${esc(cur.n)} kilitli</span><span class="cnt num">${cityQuests(cur.id).length} görev</span></div><p class="d">Şehir açılınca ${REGIONS.filter(r=>r.city===cur.id).length} bölge seni bekliyor.</p></div>`;return}
+  const cx=cityXp(cur.id);
+  $("regions").innerHTML=REGIONS.filter(r=>r.city===cur.id).map(r=>{
     const qs=regQuests(r.id),dn=qs.filter(q=>isDone(q.id)).length;
-    if(unlocked(r,xp)){
+    if(unlocked(r)){
       const isNew=!S.seenRegions.includes(r.id);
       return `<button class="region${dn===qs.length?" complete":""}${isNew?" new":""}" style="--rc:${r.c}" data-r="${r.id}">
         <div class="top"><span class="nm">${esc(r.n)}</span><span class="cnt num">${dn===qs.length?"🏁 ":""}${dn}/${qs.length}</span></div>
@@ -450,7 +531,7 @@ function renderRegions(){
     const first=!nextShown;nextShown=true;
     return `<div class="region locked" style="--rc:${r.c}">
       <div class="top"><span class="nm">🔒 ${esc(r.n)}</span><span class="cnt num">${r.xp} XP</span></div>
-      ${first?`<p class="d">Açılmasına ${r.xp-xp} XP kaldı · ${qs.length} görev seni bekliyor</p><div class="track"><i style="width:${Math.round(xp/r.xp*100)}%"></i></div>`:`<p class="d">${qs.length} görev · gizli</p>`}
+      ${first?`<p class="d">${esc(cur.n)}'de ${r.xp-cx} XP daha kazan · ${qs.length} görev seni bekliyor</p><div class="track"><i style="width:${Math.round(cx/r.xp*100)}%"></i></div>`:`<p class="d">${qs.length} görev · gizli</p>`}
     </div>`;
   }).join("");
   $("regions").querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>openRegion(b.dataset.r));
@@ -461,7 +542,7 @@ function questRow(q,showReg=false){
   const tags=(q.tags||[]).slice(0,3).map(t=>TAGTR[t]).filter(Boolean).join(" · ");
   return `<button class="q${rec?" done":""}" data-q="${q.id}">
     <span class="ico">${rec?"✓":TYPE[q.t].e}</span>
-    <span><span class="nm">${esc(q.n)}</span><span class="meta">${showReg?`<span>${esc(r.de)}</span>`:""}${tags?`<span>${tags}</span>`:""}${dist}</span></span>
+    <span><span class="nm">${esc(q.n)}</span><span class="meta">${showReg?`<span>${showReg==="city"?cityOf(q).flag+" ":""}${esc(r.de)}</span>`:""}${tags?`<span>${tags}</span>`:""}${dist}</span></span>
     <span class="xp num">${rec?"+"+recXp(q.id,rec):q.xp} XP</span></button>`;
 }
 function bindRows(root){root.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>openItem(b.dataset.q))}
@@ -469,12 +550,17 @@ function bindRows(root){root.querySelectorAll("[data-q]").forEach(b=>b.onclick=(
 function renderMood(){
   $("moodChips").innerHTML=MOODS.map(([k,l])=>`<button class="chip" aria-pressed="${mood===k}" data-m="${k}">${l}</button>`).join("");
   $("moodChips").querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{mood=b.dataset.m;if(mood==="near"&&!here){locate(()=>renderMood(),true)}renderMood()});
-  const xp=totalXp(),m=new Date().getMonth()+1;
-  let list=QUESTS.filter(q=>unlocked(regById[q.r],xp)&&!isDone(q.id)&&(!q.months||q.months.includes(m)));
+  const m=new Date().getMonth()+1,cid=openCity().id;
+  let list=QUESTS.filter(q=>unlocked(regById[q.r])&&!isDone(q.id)&&(!q.months||q.months.includes(m)));
   if(mood==="near"){
     if(!here){$("moodList").innerHTML=`<div class="empty">Konumun alınıyor… (izin vermen gerekiyor)</div>`;return}
-    list=list.filter(q=>q.r!=="ausflug").sort((a,b)=>haversine(here,a.ll)-haversine(here,b.ll));
-  }else if(mood==="ye")list=list.filter(q=>q.t==="ye");
+    list=list.filter(q=>!regById[q.r].trip).sort((a,b)=>haversine(here,a.ll)-haversine(here,b.ll));
+    list=list.slice(0,8);
+    $("moodList").innerHTML=list.length?list.map(q=>questRow(q,"city")).join(""):`<div class="empty">Yakında açık görev yok.</div>`;
+    bindRows($("moodList"));return;
+  }
+  list=list.filter(q=>regById[q.r].city===cid);
+  if(mood==="ye")list=list.filter(q=>q.t==="ye");
   else if(mood!=="all")list=list.filter(q=>(q.tags||[]).includes(mood));
   else list=[...list].sort((a,b)=>a.r===b.r?0:REGIONS.findIndex(r=>r.id===a.r)-REGIONS.findIndex(r=>r.id===b.r));
   list=list.slice(0,8);
@@ -496,7 +582,7 @@ function renderRegion(){
   const F=[["all","Hepsi"],["gez","👀 Gez"],["ye","🍽️ Ye"],["yap","🎯 Yap"],["todo","Yapılmadı"]];
   let list=qs;
   if(regFilter==="todo")list=qs.filter(q=>!isDone(q.id));else if(regFilter!=="all")list=qs.filter(q=>q.t===regFilter);
-  if(here&&r.id!=="ausflug")list=[...list].sort((a,b)=>haversine(here,a.ll)-haversine(here,b.ll));
+  if(here&&!r.trip)list=[...list].sort((a,b)=>haversine(here,a.ll)-haversine(here,b.ll));
   $("regionView").innerHTML=`
     <button class="back" id="backBtn" type="button">‹ Bölgeler</button>
     <div class="rhead" style="--rc:${r.c}">
@@ -515,7 +601,7 @@ function renderRegion(){
 let sheetEl=null;
 function closeSheet(){sheetEl?.remove();sheetEl=null;document.body.style.overflow=""}
 function mapsLinks(it,r){
-  const q=encodeURIComponent(it.n.replace(/ —.*$/,"").replace(/\(.*?\)/g,"").trim()+(r&&r.id==="ausflug"?"":" Hamburg"));
+  const q=encodeURIComponent(it.n.replace(/ —.*$/,"").replace(/\(.*?\)/g,"").trim()+(r&&r.trip?"":" "+cityOf(it).n));
   return `<a class="btn sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${it.ll[0]},${it.ll[1]}&travelmode=transit">🚆 Yol tarifi</a>
     <a class="btn sm" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${q}">🔎 Haritada ara</a>`;
 }
@@ -526,7 +612,8 @@ function evWhen(e){
 function openItem(id){
   const it=itemById(id);if(!it)return;
   const isEv=!!evById[id],r=isEv?null:regById[it.r];
-  if(r&&!unlocked(r)){toast(`🔒 ${r.n} ${r.xp} XP'de açılır`);return}
+  if(r&&!unlocked(r)){const c=cityById[r.city];toast(cityOpen(c)?`🔒 ${r.n}: ${c.n}'de ${r.xp} XP'de açılır`:`🔒 ${c.n} henüz kilitli`);return}
+  const city=cityOf(it);
   closeSheet();
   const rec=S.done[id];const type=isEv?TYPE.etk:TYPE[it.t];
   const dq=dailyQuest();const isDaily=dq&&dq.id===id;
@@ -534,7 +621,7 @@ function openItem(id){
   sc.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(it.n)}">
     <div class="grab"></div>
     <div class="row">
-      ${r?`<span class="pill reg" style="--rc:${r.c}">${esc(r.n)}</span>`:`<span class="pill">📅 ${esc(evWhen(it))}</span>`}
+      ${r?`<span class="pill reg" style="--rc:${r.c}">${city.flag} ${esc(r.n)}</span>`:`<span class="pill">${city.flag} 📅 ${esc(evWhen(it))}</span>`}
       <span class="pill">${type.e} ${type.tr} <span class="de">${type.de}</span></span>
       <span class="pill xp">+${it.xp} XP</span>
       ${isDaily?`<span class="pill xp">⭐ Günün görevi +${BONUS.daily}</span>`:""}
@@ -545,15 +632,15 @@ function openItem(id){
     ${it.tip?`<div class="block"><span class="lbl">İpucu</span><p>${esc(it.tip)}</p></div>`:""}
     ${it.chef?`<div class="block chef"><span class="lbl">👨‍🍳 Aşçı notu</span><p>${esc(it.chef)}</p></div>`:""}
     ${it.pork?`<div class="block pork"><span class="lbl">🐷 Domuz uyarısı</span><p>${esc(it.pork)}</p></div>`:""}
-    ${it.ph?`<div class="block de-ph"><span class="lbl">🗣️ Almanca cümle</span><span class="de-t">${esc(it.ph[0])}</span><span class="muted small">${esc(it.ph[1])}</span>
-      <button class="speak" type="button" data-say="${esc(it.ph[0])}">🔊 Dinle</button></div>`:""}
+    ${it.ph?`<div class="block de-ph"><span class="lbl">🗣️ ${esc(city.langTr)} cümle</span><span class="de-t">${esc(it.ph[0])}</span><span class="muted small">${esc(it.ph[1])}</span>
+      <button class="speak" type="button" data-say="${esc(it.ph[0])}" data-lang="${city.lang}">🔊 Dinle</button></div>`:""}
     ${it.film?`<div class="block film"><span class="lbl">🎥 Vlog fikri</span><p>${esc(it.film)}</p></div>`:""}
     <div class="row">${mapsLinks(it,r)}</div>
     <div id="sheetAction"></div>
   </div>`;
   sc.addEventListener("click",e=>{if(e.target===sc)closeSheet()});
   document.body.appendChild(sc);document.body.style.overflow="hidden";sheetEl=sc;
-  sc.querySelector("[data-say]")?.addEventListener("click",e=>say(e.currentTarget.dataset.say));
+  sc.querySelector("[data-say]")?.addEventListener("click",e=>say(e.currentTarget.dataset.say,e.currentTarget.dataset.lang));
   renderAction(id,isDaily);
 }
 function renderAction(id,isDaily){
@@ -593,8 +680,8 @@ function renderAction(id,isDaily){
     save();closeSheet();celebrate(id,before);renderAll();
   };
 }
-function say(text){
-  try{const u=new SpeechSynthesisUtterance(text);u.lang="de-DE";u.rate=.9;const v=speechSynthesis.getVoices().find(v=>v.lang.startsWith("de"));if(v)u.voice=v;speechSynthesis.cancel();speechSynthesis.speak(u)}
+function say(text,lang="de-DE"){
+  try{const u=new SpeechSynthesisUtterance(text);u.lang=lang;u.rate=.9;const v=speechSynthesis.getVoices().find(v=>v.lang.replace("_","-").startsWith(lang.slice(0,2)));if(v)u.voice=v;speechSynthesis.cancel();speechSynthesis.speak(u)}
   catch{toast("Bu cihazda sesli okuma yok")}
 }
 
@@ -607,17 +694,20 @@ function locate(cb,silent,onErr){
 }
 
 /* ---------- celebrations ---------- */
-function snapshot(){const xp=totalXp();return {xp,lvl:levelOf(xp),regs:REGIONS.filter(r=>unlocked(r,xp)).map(r=>r.id),
+function snapshot(){const xp=totalXp();return {xp,lvl:levelOf(xp),regs:REGIONS.filter(r=>unlocked(r)).map(r=>r.id),cities:CITIES.filter(cityOpen).map(c=>c.id),
   badges:BADGES.filter(b=>{const [v,g]=badgeProgress(b,stats());return v>=g}).map(b=>b.id)}}
-function celebrate(id,before){
+function celebrate(id,before,opts={}){
   const after=snapshot(),gain=after.xp-before.xp;
-  const newRegs=after.regs.filter(r=>!before.regs.includes(r)).map(r=>regById[r]);
+  const newCities=after.cities.filter(c=>!before.cities.includes(c)).map(c=>cityById[c]);
+  const newRegs=after.regs.filter(r=>!before.regs.includes(r)&&!newCities.some(c=>c.id===regById[r].city)).map(r=>regById[r]);
   const newBadges=after.badges.filter(b=>!before.badges.includes(b)).map(b=>BADGES.find(x=>x.id===b));
   const lvlUp=after.lvl>before.lvl;
   const it=id?itemById(id):null;
   let big="🎉",h="Harika!",body="";
-  if(newRegs.length){big="🔓";h="Yeni bölge açıldı!";body=newRegs.map(r=>`<b style="color:${r.c}">${esc(r.n)}</b><br><span class="small muted">${esc(r.d)}</span>`).join("<br>")}
+  if(newCities.length){big=newCities[0].flag;h=newCities.length>1?"Yeni şehirler açıldı!":`${newCities[0].n} açıldı!`;body=newCities.map(c=>`<b style="color:${c.c}">${c.flag} ${esc(c.n)}</b><br><span class="small muted">${esc(c.d)}</span>`).join("<br>")}
+  else if(newRegs.length){big="🔓";h="Yeni bölge açıldı!";body=newRegs.map(r=>`<b style="color:${r.c}">${esc(r.n)}</b><br><span class="small muted">${esc(r.d)}</span>`).join("<br>")}
   else if(lvlUp){big="⬆️";h="Seviye atladın!"}
+  if(opts.big){big=opts.big;h=opts.h}
   if(lvlUp)body+=`<div><b>${esc(LEVELS[after.lvl].n)}</b> <span class="small muted">· ${esc(LEVELS[after.lvl].tr)}</span></div>`;
   if(newBadges.length)body+=newBadges.map(b=>`<div>${b.ic} Yeni rozet: <b>${esc(b.n)}</b></div>`).join("");
   if(it?.ph)body+=`<div class="small">🗣️ Defterine eklendi: <i>${esc(it.ph[0])}</i></div>`;
@@ -625,7 +715,7 @@ function celebrate(id,before){
   c.innerHTML=`<div class="box"><div class="big">${big}</div><div class="h">${h}</div><div class="xpgain num">+${gain} XP</div>${body}<button class="btn primary" type="button">Devam</button></div>`;
   c.onclick=e=>{if(e.target===c||e.target.tagName==="BUTTON")c.remove()};
   document.body.appendChild(c);
-  if(newRegs.length||lvlUp||newBadges.length)confetti();
+  if(newCities.length||newRegs.length||lvlUp||newBadges.length||opts.big)confetti();
 }
 function confetti(){
   if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
@@ -650,20 +740,27 @@ function evStatus(e,now=new Date()){
 function evCard(e){
   const st=evStatus(e),done=isDone(e.id);
   return `<button class="ev${st.state==="live"?" live":""}${done?" done":""}" data-e="${e.id}">
-    <div class="top"><span class="nm">${done?"✅ ":""}${esc(e.n)}</span>${st.state==="live"?`<span class="badge-live">ŞU AN · ${esc(st.label)}</span>`:st.state==="soon"?`<span class="badge-soon">${esc(st.label)}</span>`:`<span class="when">${esc(st.label)}</span>`}</div>
+    <div class="top"><span class="nm">${done?"✅ ":""}<span class="flagtag">${cityOf(e).flag}</span>${esc(e.n)}</span>${st.state==="live"?`<span class="badge-live">ŞU AN · ${esc(st.label)}</span>`:st.state==="soon"?`<span class="badge-soon">${esc(st.label)}</span>`:`<span class="when">${esc(st.label)}</span>`}</div>
     <span class="when">${esc(evWhen(e))} · +${e.xp} XP</span>
     <span class="small muted">${esc(e.d.length>120?e.d.slice(0,118)+"…":e.d)}</span></button>`;
 }
+let calCity=null;
 function renderCalendar(){
-  const evs=EVENTS.map(e=>({e,st:evStatus(e)})).filter(x=>x.st.state!=="past");
-  const live=evs.filter(x=>x.st.state==="live"),next=evs.filter(x=>x.st.state!=="live").sort((a,b)=>a.st.sort-b.st.sort);
+  const cid=openCity().id,mine=e=>cityIdOf(e)===cid?0:1;
+  if(calCity!=="all"&&!cityById[calCity])calCity=cid;
+  $("calChips").innerHTML=[...CITIES.map(c=>[c.id,`${c.flag} ${c.n}`]),["all","🌍 Hepsi"]].map(([k,l])=>`<button class="chip" aria-pressed="${calCity===k}" data-cal="${k}">${esc(l)}</button>`).join("");
+  $("calChips").querySelectorAll("[data-cal]").forEach(b=>b.onclick=()=>{calCity=b.dataset.cal;renderCalendar()});
+  const evs=EVENTS.filter(e=>calCity==="all"||cityIdOf(e)===calCity).map(e=>({e,st:evStatus(e)})).filter(x=>x.st.state!=="past");
+  const live=evs.filter(x=>x.st.state==="live").sort((a,b)=>mine(a.e)-mine(b.e)),next=evs.filter(x=>x.st.state!=="live").sort((a,b)=>a.st.sort-b.st.sort||mine(a.e)-mine(b.e));
   $("evNow").innerHTML=`<h3>Şu an <span class="de">Jetzt</span></h3>`+(live.map(x=>evCard(x.e)).join("")||'<div class="empty">Şu an süren etkinlik yok.</div>');
   $("evNext").innerHTML=`<h3>Yaklaşanlar <span class="de">Demnächst</span></h3>`+next.map(x=>evCard(x.e)).join("");
   document.querySelectorAll("[data-e]").forEach(b=>b.onclick=()=>openItem(b.dataset.e));
   const wd=new Date().getDay(); // 0 Sun
-  const until=d=>{const n=(d-wd+7)%7;return n===0?"BUGÜN":n===1?"yarın":`${n} gün sonra`};
-  const W=[["Fischmarkt (Pazar sabahı)",0,"fischmarkt"],["Isemarkt (Salı)",2,"isemarkt"],["Isemarkt (Cuma)",5,"isemarkt"],["Flohschanze bit pazarı (Cumartesi)",6,"flohschanze"]];
-  $("weekly").innerHTML=W.map(([n,d,q])=>`<div><span>${esc(n)}${isDone(q)?" ✅":""}</span><b class="small">${until(d)}</b></div>`).join("");
+  const until=d=>{if(d<0)return "her gün";const n=(d-wd+7)%7;return n===0?"BUGÜN":n===1?"yarın":`${n} gün sonra`};
+  const wc=calCity==="all"?cid:calCity;
+  const W=WEEKLY.filter(w=>w.city===wc);
+  $("weekly").parentElement.hidden=!W.length;
+  $("weekly").innerHTML=W.map(w=>`<div><span>${cityById[wc].flag} ${esc(w.n)}${isDone(w.q)?" ✅":""}</span><b class="small">${until(w.d)}</b></div>`).join("");
 }
 
 /* ---------- badges, levels, words, custom ---------- */
@@ -677,8 +774,8 @@ function renderBadges(){
   const totalPh=QUESTS.filter(q=>q.ph).length+EVENTS.filter(e=>e.ph).length;
   $("wordCount").textContent=`${words.length}/${totalPh} cümle`;
   $("words").className="words"+(quiz?" quiz":"");
-  $("words").innerHTML=words.map(i=>`<div class="word"><b>${esc(i.ph[0])}</b><span>${esc(i.ph[1])}</span></div>`).join("")||'<div class="empty">İlk görevini bitir, ilk cümlen buraya gelsin.</div>';
-  $("words").querySelectorAll(".word").forEach(w=>w.onclick=()=>{if(quiz)w.classList.toggle("show");else say(w.querySelector("b").textContent)});
+  $("words").innerHTML=words.map(i=>`<div class="word" data-lang="${cityOf(i).lang}"><b>${cityOf(i).flag} ${esc(i.ph[0])}</b><span>${esc(i.ph[1])}</span></div>`).join("")||'<div class="empty">İlk görevini bitir, ilk cümlen buraya gelsin.</div>';
+  $("words").querySelectorAll(".word").forEach((w,k)=>w.onclick=()=>{if(quiz)w.classList.toggle("show");else say(words[k].ph[0],w.dataset.lang)});
   $("customList").innerHTML=S.custom.slice().reverse().map(c=>`<div class="q done" style="cursor:default"><span class="ico">${TYPE[c.t].e}</span>
     <span><span class="nm">${esc(c.n)}</span><span class="meta"><span>${fmtDate(c.at)}</span>${c.note?`<span>${esc(c.note)}</span>`:""}${c.ll?`<a href="https://www.google.com/maps/search/?api=1&query=${c.ll[0]},${c.ll[1]}" target="_blank" rel="noopener">📍 konum</a>`:""}</span></span>
     <button class="btn sm ghost" data-del="${c.id}" type="button" aria-label="Sil">✕</button></div>`).join("");
@@ -687,20 +784,20 @@ function renderBadges(){
 $("quizBtn").onclick=()=>{quiz=!quiz;$("quizBtn").textContent=quiz?"👀 Hepsini göster":"🧠 Ezber modu";renderBadges()};
 $("customForm").addEventListener("submit",e=>{
   e.preventDefault();const n=$("cName").value.trim();if(!n)return;
-  const add=ll=>{const before=snapshot();S.custom.push({id:"c"+Date.now(),n,t:$("cType").value,note:$("cNote").value.trim(),at:today(),ll:ll||null});save();
+  const add=ll=>{const before=snapshot();S.custom.push({id:"c"+Date.now(),city:openCity().id,n,t:$("cType").value,note:$("cNote").value.trim(),at:today(),ll:ll||null});save();
     $("customForm").reset();celebrate(null,before);renderAll()};
   if($("cGps").checked)locate(p=>add([+p[0].toFixed(5),+p[1].toFixed(5)]),false,m=>{toast(m);add(null)});else add(null);
 });
 $("exportBtn").onclick=()=>{
   const blob=new Blob([JSON.stringify(S,null,1)],{type:"application/json"});const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);a.download=`hamburg-kesif-${today()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  a.href=URL.createObjectURL(blob);a.download=`kezu-yedek-${today()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 };
 $("importFile").onchange=async e=>{
   const f=e.target.files[0];if(!f)return;
-  try{const d=JSON.parse(await f.text());if(!d||typeof d.done!=="object")throw 0;S={custom:[],seenRegions:[],seenLevel:0,...d};save();renderAll();toast("Yedek yüklendi ✓")}
+  try{const d=JSON.parse(await f.text());if(!d||typeof d.done!=="object")throw 0;S={...FRESH(),...d};save();renderAll();toast("Yedek yüklendi ✓")}
   catch{toast("Bu dosya geçerli bir yedek değil")}e.target.value="";
 };
-$("resetBtn").onclick=()=>{if(!confirm("Tüm ilerleme silinsin mi? Önce yedek almanı öneririm."))return;if(!confirm("Emin misin? Geri alınamaz."))return;S={done:{},custom:[],seenRegions:[],seenLevel:0};save();renderAll()};
+$("resetBtn").onclick=()=>{if(!confirm("Tüm ilerleme silinsin mi? Önce yedek almanı öneririm."))return;if(!confirm("Emin misin? Geri alınamaz."))return;S=FRESH();save();renderAll()};
 $("lvlChip").onclick=()=>switchTab("rozet");
 
 /* ---------- map (Leaflet, lazy) ---------- */
@@ -715,7 +812,7 @@ function loadLeaflet(){
 async function showMap(){
   try{await loadLeaflet()}catch{$("map").innerHTML='<div class="map-msg">Harita için internet lazım. Bağlanınca tekrar dene.</div>';return}
   if(!map){
-    map=L.map("map",{zoomControl:false,attributionControl:true}).setView([53.5500,9.9800],13);
+    map=L.map("map",{zoomControl:false,attributionControl:true}).setView(openCity().ll,openCity().z);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
     L.control.zoom({position:"bottomright"}).addTo(map);
     mapLayers=L.layerGroup().addTo(map);
@@ -725,8 +822,12 @@ async function showMap(){
 }
 function drawMap(){
   if(!map)return;mapLayers.clearLayers();const xp=totalXp();
-  REGIONS.filter(r=>r.id!=="ausflug").forEach(r=>{
-    const open=unlocked(r,xp);const qs=regQuests(r.id);
+  CITIES.filter(c=>!cityOpen(c)).forEach(c=>{
+    L.circle(c.ll,{radius:9000,color:"#6b7480",weight:1.5,dashArray:"6 6",fillColor:"#6b7480",fillOpacity:.22}).addTo(mapLayers)
+      .bindTooltip(`🔒 ${c.flag} ${c.n} · ${c.xp} XP`,{direction:"center",permanent:true,className:"lock-label"});
+  });
+  REGIONS.filter(r=>!r.trip&&cityOpen(cityById[r.city])).forEach(r=>{
+    const open=unlocked(r);const qs=regQuests(r.id);
     const pts=qs.map(q=>q.ll);const lat=pts.reduce((a,p)=>a+p[0],0)/pts.length,lng=pts.reduce((a,p)=>a+p[1],0)/pts.length;
     // circle covers the core of the region; far-out quests (e.g. Ohlsdorf) stay outside rather than blowing it up
     const ds=pts.map(p=>haversine([lat,lng],p)).sort((a,b)=>a-b);
@@ -741,15 +842,15 @@ function drawMap(){
         .bindTooltip(`${d?"✅":TYPE[q.t].e} ${q.n}`).on("click",()=>openItem(q.id));
     });
   });
-  EVENTS.filter(e=>evStatus(e).state==="live"&&haversine([53.55,9.99],e.ll)<20000).forEach(e=>{
+  EVENTS.filter(e=>evStatus(e).state==="live"&&cityOpen(cityOf(e))).forEach(e=>{
     L.circleMarker(e.ll,{radius:10,color:"#e8b84a",weight:3,fillColor:"#c8102e",fillOpacity:1}).addTo(mapLayers).bindTooltip("🎡 "+e.n).on("click",()=>openItem(e.id));
   });
   if(here){meMarker=L.circleMarker(here,{radius:8,color:"#fff",weight:3,fillColor:"#2a7fff",fillOpacity:1}).addTo(mapLayers).bindTooltip("Sen buradasın")}
-  const open=REGIONS.filter(r=>unlocked(r,xp)).length;
-  $("legend").innerHTML=`<span><i class="dot" style="background:var(--accent)"></i>Yapılacak</span><span><i class="dot" style="background:#1d8a5a"></i>Tamamlandı</span><span>🔒 Kilitli bölge · ${open}/${REGIONS.length} açık</span>`;
+  const cur=openCity(),cr=REGIONS.filter(r=>r.city===cur.id),open=cr.filter(r=>unlocked(r)).length;
+  $("legend").innerHTML=`<span><i class="dot" style="background:var(--accent)"></i>Yapılacak</span><span><i class="dot" style="background:#1d8a5a"></i>Tamamlandı</span><span>🔒 ${cur.flag} ${esc(cur.n)} · ${open}/${cr.length} bölge açık</span>`;
 }
 $("locBtn").onclick=()=>locate(p=>{drawMap();map&&map.setView(p,15)});
-$("fitBtn").onclick=()=>map&&map.setView([53.5500,9.9800],13);
+$("fitBtn").onclick=()=>map&&map.setView(openCity().ll,openCity().z);
 
 /* ---------- tabs ---------- */
 let tab="kesfet";
@@ -763,10 +864,10 @@ function switchTab(t){
 }
 document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>{if(b.dataset.tab==="kesfet"&&tab==="kesfet"&&curRegion)closeRegion();switchTab(b.dataset.tab)});
 
-function renderHome(){renderPlayer();renderDaily();renderRegions();renderMood()}
+function renderHome(){renderPlayer();renderDaily();renderCities();renderRegions();renderMood()}
 function renderAll(){
   renderPlayer();
-  if(curRegion)renderRegion();else{renderDaily();renderRegions();renderMood()}
+  if(curRegion)renderRegion();else{renderDaily();renderCities();renderRegions();renderMood()}
   renderCalendar();renderBadges();drawMap();
 }
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(document.querySelector(".celebrate"))document.querySelector(".celebrate").remove();else closeSheet()}});

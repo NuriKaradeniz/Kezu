@@ -1,5 +1,5 @@
-const CACHE="kezu-v4";
-const FILES=["./","index.html","data.js","manifest.webmanifest","icon-180.png","icon-192.png","icon-512.png"];
+const CACHE="kezu-v5";
+const FILES=["./","index.html","data.js","cities.js","manifest.webmanifest","icon-180.png","icon-192.png","icon-512.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)));self.skipWaiting()});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith("kezu")&&k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});
 // network first so updates arrive, cache when offline; map tiles are not cached (too many)
