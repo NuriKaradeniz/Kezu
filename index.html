@@ -58,6 +58,8 @@ h3{margin:0;font-size:1rem}
 /* header */
 header{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .brand{font-family:var(--f-display);font-weight:800;font-size:1.3rem;letter-spacing:-.01em;line-height:1.15}
+.brandrow{display:flex;align-items:center;gap:8px;min-width:0}
+.crest{width:31px;height:36px;flex:none;color:var(--ink)}
 .brand small{display:block;font-family:var(--f-mono);font-weight:400;font-size:.68rem;color:var(--muted);letter-spacing:.04em}
 .lvl-chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-weight:700;font-size:.85rem;cursor:pointer;white-space:nowrap}
 
@@ -228,12 +230,35 @@ nav.tabs button[aria-selected="true"]{color:var(--accent)}
 .confetti{position:fixed;top:-10px;width:8px;height:14px;z-index:85;pointer-events:none;animation:fall linear forwards}
 @keyframes fall{to{transform:translateY(105vh) rotate(720deg)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.brandrow{flex:1 1 auto}
+.brandrow .brand{min-width:0}
+header .lvl-chip{flex:none}
+#app>header{min-width:0}
+.brandrow .brand small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:385px){.brandrow .brand small{font-size:.6rem;letter-spacing:.01em}}
 </style>
 </head>
 <body>
 <div class="wrap" id="app">
   <header>
-    <div class="brand">Kezu<small>Moin, Kaşif! · Entdecke Hamburg</small></div>
+    <div class="brandrow"><svg class="crest" viewBox="30 30 340 396" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+<path d="M40 40 H360 V232 C360 322 292 384 200 416 C108 384 40 322 40 232 Z" stroke-width="12"/>
+<path d="M200 40 V416 M40 220 H360" stroke-width="10"/>
+<g><g transform="translate(120 140) scale(1.12)" stroke-width="8.48">
+<path d="M-26 58 V12 H26 V58"/><path d="M-36 58 H36"/>
+<path d="M-9 58 V44 A9 9 0 0 1 9 44 V58"/>
+<path d="M-18 12 V-22 H18 V12"/>
+<circle cx="0" cy="-5" r="8"/><path d="M0 -5 V-9 M0 -5 H3"/>
+<path d="M-11 -22 V-40 H11 V-22"/>
+<path d="M-11 -40 Q0 -54 11 -40"/><path d="M0 -50 V-66"/></g><g transform="translate(280 132) scale(1.12)" stroke-width="8.48">
+<path d="M-56 -14 C-56 -34 -30 -40 0 -40 C30 -40 56 -34 56 -14 Z"/>
+<path d="M-56 24 H56 C56 36 46 40 32 40 H-32 C-46 40 -56 36 -56 24 Z"/>
+<path d="M-44 5 C-22 -8 12 -8 30 5 C12 18 -22 18 -44 5 Z"/>
+<path d="M30 5 L52 -6 L52 16 Z"/>
+<circle cx="-30" cy="3" r="2"/></g><g transform="translate(120 292) scale(1.12)" stroke-width="8.48"><circle cx="0" cy="-8" r="38"/><circle cx="0" cy="-8" r="4"/><path d="M0 -8 L32.9 11.0"/><path d="M0 -8 L0.0 30.0"/><path d="M0 -8 L-32.9 11.0"/><path d="M0 -8 L-32.9 -27.0"/><path d="M0 -8 L-0.0 -46.0"/><path d="M0 -8 L32.9 -27.0"/><path d="M-4 -4 L-26 52 M4 -4 L26 52 M-38 52 H38"/></g><g transform="translate(276 286) scale(1.2)" stroke-width="7.92">
+<path d="M20 6 C8 -8 0 -18 0 -30 A20 20 0 0 1 40 -30 C40 -18 32 -8 20 6 Z"/>
+<circle cx="20" cy="-30" r="6"/>
+<path d="M-48 52 C-14 52 -46 22 -10 20 C4 19 10 16 14 12" stroke-dasharray="0.1 14"/></g></g></g></svg><div class="brand">Kezu<small>Moin, Kaşif! · Entdecke Hamburg</small></div></div>
     <button class="lvl-chip" id="lvlChip" type="button"></button>
   </header>
 
