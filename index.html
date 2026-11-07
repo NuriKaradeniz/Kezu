@@ -1,0 +1,770 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Kezu</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Kezu">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f3efe7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1622" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+/* Layout: phone-first single column; bottom tab bar (Keşfet / Harita / Takvim / Rozetler); quest details open in a bottom sheet */
+:root{
+  --bg:#f3efe7; --surface:#ffffff; --ink:#14202e; --muted:#5f6b7a; --line:#ddd6c9;
+  --accent:#c8102e; --accent-ink:#ffffff; --accent-soft:#f8e1e4;
+  --sea:#1f5f8b; --sea-soft:#dfeaf3;
+  --good:#1d8a5a; --good-soft:#dcf1e6; --gold:#b07d10; --gold-soft:#f6ecd2;
+  --lock:#9aa3ad;
+  --f-display:ui-rounded,"SF Pro Rounded",ui-sans-serif,system-ui,sans-serif;
+  --f-body:ui-sans-serif,system-ui,sans-serif;
+  --f-mono:ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1622; --surface:#152232; --ink:#e7edf4; --muted:#93a1b2; --line:#26364a;
+  --accent:#ff5a6e; --accent-ink:#0d1622; --accent-soft:#3a1d27;
+  --sea:#6fb2e3; --sea-soft:#183049;
+  --good:#4cc68c; --good-soft:#163a2a; --gold:#e8b84a; --gold-soft:#3a2f14;
+  --lock:#56657a; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0d1622; --surface:#152232; --ink:#e7edf4; --muted:#93a1b2; --line:#26364a;
+  --accent:#ff5a6e; --accent-ink:#0d1622; --accent-soft:#3a1d27;
+  --sea:#6fb2e3; --sea-soft:#183049;
+  --good:#4cc68c; --good-soft:#163a2a; --gold:#e8b84a; --gold-soft:#3a2f14;
+  --lock:#56657a; color-scheme:dark }
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-top:env(safe-area-inset-top,0px);overscroll-behavior-y:none}
+[hidden]{display:none!important}
+button,input,textarea,select{font:inherit;color:inherit}
+input,textarea{font-size:16px!important}
+:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+a{color:var(--sea)}
+.wrap{max-width:600px;margin:0 auto;padding:16px 16px calc(96px + env(safe-area-inset-bottom,0px));display:grid;gap:16px}
+.de{font-family:var(--f-mono);font-size:.72rem;color:var(--muted);letter-spacing:.02em}
+.num{font-variant-numeric:tabular-nums}
+h2{font-family:var(--f-display);font-size:1.1rem;margin:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+h3{margin:0;font-size:1rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:12px}
+.muted{color:var(--muted)}
+.small{font-size:.82rem}
+
+/* header */
+header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:1.3rem;letter-spacing:-.01em;line-height:1.15}
+.brand small{display:block;font-family:var(--f-mono);font-weight:400;font-size:.68rem;color:var(--muted);letter-spacing:.04em}
+.lvl-chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-weight:700;font-size:.85rem;cursor:pointer;white-space:nowrap}
+
+/* player card */
+.player{background:linear-gradient(135deg,#1f5f8b,#0d2c47);color:#fff;border-radius:22px;padding:18px;display:grid;gap:12px;position:relative;overflow:hidden}
+.player::after{content:"⚓";position:absolute;right:-6px;bottom:-22px;font-size:110px;opacity:.09;pointer-events:none}
+.player .lv{font-family:var(--f-display);font-weight:800;font-size:1.7rem;line-height:1.1}
+.player .lv small{display:block;font-family:var(--f-body);font-weight:500;font-size:.8rem;opacity:.85}
+.xpbar{height:10px;border-radius:99px;background:rgba(255,255,255,.22);overflow:hidden}
+.xpbar i{display:block;height:100%;background:#fff;border-radius:99px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.pstats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:.72rem}
+.pstats b{display:block;font-family:var(--f-mono);font-size:1.05rem}
+.pstats span{opacity:.85}
+.xptext{display:flex;justify-content:space-between;font-size:.78rem;opacity:.9}
+
+/* daily */
+.daily{border:2px dashed var(--gold);background:var(--gold-soft);border-radius:18px;padding:14px;display:grid;gap:8px;cursor:pointer}
+.daily .tag{font-family:var(--f-mono);font-size:.7rem;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.daily .t{font-weight:700;font-size:1.05rem}
+.daily.done{border-style:solid;opacity:.75}
+
+/* chips / filters */
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;margin:0 -16px;padding-inline:16px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-size:.85rem;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;color:inherit}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.good{background:var(--good);border-color:var(--good);color:#fff}
+.btn.ghost{background:none}
+.btn.sm{padding:6px 10px;font-size:.82rem;border-radius:10px}
+.btn:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* regions */
+.regions{display:grid;gap:10px}
+.region{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 14px 14px 18px;display:grid;gap:8px;cursor:pointer;position:relative;overflow:hidden;text-align:left;width:100%}
+.region::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--rc)}
+.region .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.region .nm{font-weight:700;font-size:1rem}
+.region .cnt{font-family:var(--f-mono);font-size:.8rem;color:var(--muted);white-space:nowrap}
+.region .d{font-size:.84rem;color:var(--muted);margin:0}
+.track{height:6px;border-radius:99px;background:var(--bg);overflow:hidden}
+.track i{display:block;height:100%;border-radius:99px;background:var(--rc,var(--sea))}
+.region.locked{cursor:default;background:repeating-linear-gradient(-45deg,var(--surface),var(--surface) 10px,color-mix(in srgb,var(--line) 45%,var(--surface)) 10px,color-mix(in srgb,var(--line) 45%,var(--surface)) 20px)}
+.region.locked::before{background:var(--lock)}
+.region.locked .nm{color:var(--muted)}
+.region.locked .track i{background:var(--lock)}
+.region.complete .cnt{color:var(--good);font-weight:700}
+.region.new{animation:pop 1.4s ease 2}
+@keyframes pop{50%{box-shadow:0 0 0 4px var(--gold)}}
+
+/* quest list */
+.back{border:0;background:none;padding:0;color:var(--sea);font-weight:600;cursor:pointer;justify-self:start}
+.rhead{border-radius:18px;padding:16px;color:#fff;background:var(--rc);display:grid;gap:6px}
+.rhead h2{color:#fff;font-size:1.3rem}
+.rhead p{margin:0;font-size:.88rem;opacity:.92}
+.rhead .track{background:rgba(255,255,255,.25)}
+.rhead .track i{background:#fff}
+.quests{display:grid;gap:8px}
+.q{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;cursor:pointer;text-align:left;width:100%}
+.q .ico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:1.3rem;background:var(--bg)}
+.q .nm{font-weight:600;line-height:1.25}
+.q .meta{font-size:.74rem;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.q .xp{font-family:var(--f-mono);font-weight:700;font-size:.82rem;color:var(--gold);white-space:nowrap}
+.q.done{background:var(--good-soft);border-color:color-mix(in srgb,var(--good) 35%,var(--line))}
+.q.done .ico{background:var(--good);color:#fff}
+.q.done .xp{color:var(--good)}
+.q .dist{font-family:var(--f-mono)}
+.empty{text-align:center;color:var(--muted);padding:20px;font-size:.9rem}
+
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(5,10,18,.5);z-index:50;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.sheet{background:var(--bg);width:100%;max-width:600px;max-height:92vh;overflow-y:auto;border-radius:22px 22px 0 0;padding:8px 16px calc(24px + env(safe-area-inset-bottom,0px));display:grid;gap:14px;animation:up .25s cubic-bezier(.2,.8,.2,1);overscroll-behavior:contain}
+@keyframes up{from{transform:translateY(40px);opacity:.4}}
+.grab{width:40px;height:5px;border-radius:9px;background:var(--line);justify-self:center;margin:4px 0}
+.sheet .title{font-family:var(--f-display);font-weight:800;font-size:1.35rem;line-height:1.2;margin:0}
+.pill{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 10px;font-size:.75rem;font-weight:600;background:var(--surface);border:1px solid var(--line)}
+.pill.xp{background:var(--gold-soft);border-color:transparent;color:var(--gold)}
+.pill.reg{color:#fff;border-color:transparent;background:var(--rc)}
+.block{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:4px}
+.block .lbl{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.block p{margin:0}
+.block.chef{background:var(--sea-soft);border-color:transparent}
+.block.chef .lbl{color:var(--sea)}
+.block.pork{background:var(--accent-soft);border-color:transparent}
+.block.pork .lbl{color:var(--accent)}
+.block.de-ph .de-t{font-weight:700;font-size:1.05rem}
+.block.film{background:var(--gold-soft);border-color:transparent}
+.block.film .lbl{color:var(--gold)}
+.speak{border:0;background:var(--bg);border-radius:999px;padding:4px 10px;cursor:pointer;font-size:.8rem;justify-self:start;margin-top:4px}
+.complete{border:2px solid var(--good);border-radius:16px;padding:14px;display:grid;gap:10px;background:var(--surface)}
+.opt{display:flex;align-items:center;gap:10px;cursor:pointer}
+.opt input{width:22px;height:22px;accent-color:var(--good)}
+.stars{display:flex;gap:4px}
+.stars button{border:0;background:none;font-size:1.6rem;cursor:pointer;padding:0 2px;filter:grayscale(1);opacity:.45}
+.stars button.on{filter:none;opacity:1}
+textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--bg);resize:vertical;min-height:60px}
+.gpsres{font-size:.85rem}
+.gpsres.ok{color:var(--good);font-weight:600}
+.gpsres.far{color:var(--accent)}
+.donebox{background:var(--good-soft);border-radius:14px;padding:12px 14px;display:grid;gap:6px}
+
+/* map */
+#mapView{position:fixed;inset:0;top:env(safe-area-inset-top,0px);bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:5}
+#map{position:absolute;inset:0;background:var(--bg)}
+.map-ctrl{position:absolute;right:12px;top:12px;z-index:500;display:grid;gap:8px}
+.map-ctrl button{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:1.2rem;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.map-legend{position:absolute;left:12px;bottom:12px;z-index:500;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-size:.75rem;display:grid;gap:3px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:-1px;margin-right:5px}
+.leaflet-container{font-family:var(--f-body)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.85) contrast(.9)}}
+.leaflet-tooltip.lock-label{background:rgba(20,32,46,.8);color:#fff;border:0;box-shadow:none;font-weight:700;font-size:11px;padding:2px 6px;border-radius:8px}
+.leaflet-tooltip.lock-label::before{display:none}
+.map-msg{position:absolute;inset:0;display:grid;place-items:center;padding:30px;text-align:center;color:var(--muted)}
+
+/* calendar */
+.ev{display:grid;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;text-align:left;width:100%}
+.ev .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.ev .nm{font-weight:700}
+.ev .when{font-family:var(--f-mono);font-size:.75rem;color:var(--muted)}
+.ev.live{border:2px solid var(--accent)}
+.ev.done{background:var(--good-soft)}
+.badge-live{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:2px 8px;font-size:.7rem;font-weight:700;white-space:nowrap}
+.badge-soon{background:var(--sea-soft);color:var(--sea);border-radius:999px;padding:2px 8px;font-size:.7rem;font-weight:700;white-space:nowrap}
+.weekly{display:grid;gap:6px}
+.weekly div{display:flex;justify-content:space-between;gap:8px;font-size:.88rem;border-bottom:1px dashed var(--line);padding-bottom:6px}
+.weekly div:last-child{border:0;padding:0}
+
+/* badges */
+.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.bdg{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:4px;text-align:center}
+.bdg .i{font-size:2rem;filter:grayscale(1);opacity:.4}
+.bdg.got .i{filter:none;opacity:1}
+.bdg.got{border-color:var(--gold);background:var(--gold-soft)}
+.bdg .n{font-weight:700;font-size:.85rem;line-height:1.2}
+.bdg .d{font-size:.72rem;color:var(--muted)}
+.bdg .p{font-family:var(--f-mono);font-size:.72rem}
+.levels{display:grid;gap:4px}
+.levels div{display:flex;justify-content:space-between;font-size:.86rem;padding:4px 0}
+.levels .cur{font-weight:800;color:var(--accent)}
+.levels .past{color:var(--muted);text-decoration:line-through}
+.words{display:grid;gap:6px}
+.word{border-bottom:1px dashed var(--line);padding-bottom:6px;cursor:pointer}
+.word:last-child{border:0}
+.word b{display:block}
+.word span{font-size:.84rem;color:var(--muted)}
+.words.quiz .word span{filter:blur(5px)}
+.words.quiz .word.show span{filter:none}
+.custom{display:grid;gap:8px}
+.field{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;width:100%;min-width:0}
+
+/* tabbar */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav.tabs button{border:0;background:none;padding:8px 0 10px;display:grid;justify-items:center;gap:1px;cursor:pointer;color:var(--muted);font-size:.7rem;font-weight:600}
+nav.tabs button .e{font-size:1.35rem;line-height:1.2}
+nav.tabs button[aria-selected="true"]{color:var(--accent)}
+
+/* celebrate + toast */
+.celebrate{position:fixed;inset:0;z-index:80;background:rgba(5,10,18,.6);display:grid;place-items:center;padding:24px;animation:fade .2s}
+.celebrate .box{background:var(--surface);border-radius:24px;padding:24px;max-width:340px;width:100%;text-align:center;display:grid;gap:10px;animation:zoom .35s cubic-bezier(.2,1.4,.4,1)}
+@keyframes zoom{from{transform:scale(.7);opacity:0}}
+.celebrate .big{font-size:3.4rem;line-height:1}
+.celebrate .h{font-family:var(--f-display);font-weight:800;font-size:1.3rem}
+.celebrate .xpgain{font-family:var(--f-mono);font-weight:800;font-size:1.6rem;color:var(--gold)}
+.toast{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:.88rem;z-index:90;max-width:90vw;text-align:center;animation:fade .2s}
+.confetti{position:fixed;top:-10px;width:8px;height:14px;z-index:85;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <header>
+    <div class="brand">Kezu<small>Moin, Kaşif! · Entdecke Hamburg</small></div>
+    <button class="lvl-chip" id="lvlChip" type="button"></button>
+  </header>
+
+  <!-- KEŞFET -->
+  <section id="tab-kesfet" class="tab" style="display:grid;gap:16px">
+    <div id="homeView" style="display:grid;gap:16px">
+      <div class="player" id="player"></div>
+      <div id="daily"></div>
+      <div style="display:grid;gap:8px">
+        <h2>Bölgeler <span class="de">Stadtteile</span></h2>
+        <p class="small muted" style="margin:0">Görev yaptıkça XP kazan, XP biriktikçe yeni bölgeler açılır.</p>
+      </div>
+      <div class="regions" id="regions"></div>
+      <div class="card">
+        <h2>Bugün ne yapsam? <span class="de">Was mache ich heute?</span></h2>
+        <div class="chips" id="moodChips"></div>
+        <div class="quests" id="moodList"></div>
+      </div>
+    </div>
+    <div id="regionView" hidden style="display:grid;gap:14px"></div>
+  </section>
+
+  <!-- TAKVİM -->
+  <section id="tab-takvim" class="tab" hidden style="display:grid;gap:16px">
+    <h2>Takvim <span class="de">Veranstaltungen</span></h2>
+    <div class="card">
+      <h3>Her hafta <span class="de">Jede Woche</span></h3>
+      <div class="weekly" id="weekly"></div>
+    </div>
+    <div style="display:grid;gap:8px" id="evNow"></div>
+    <div style="display:grid;gap:8px" id="evNext"></div>
+    <p class="small muted">Tarihler 2026/27 için hamburg.de ve resmi sitelerden alındı; "her yıl" yazanların kesin gününü gitmeden kontrol et. Etkinlikler bölge kilidi olmadan her zaman açık — kaçırma!</p>
+  </section>
+
+  <!-- ROZETLER -->
+  <section id="tab-rozet" class="tab" hidden style="display:grid;gap:16px">
+    <h2>Rozetler <span class="de">Abzeichen</span></h2>
+    <div class="bgrid" id="badges"></div>
+    <div class="card">
+      <h2>Seviyeler <span class="de">Ränge</span></h2>
+      <div class="levels" id="levels"></div>
+    </div>
+    <div class="card">
+      <h2>Almanca defterim <span class="de">Mein Wortschatz</span></h2>
+      <p class="small muted" style="margin:0">Her bitirdiğin görevin cümlesi buraya eklenir. Ezber modunda Türkçesini görmek için cümleye dokun.</p>
+      <div class="row"><button class="btn sm" id="quizBtn" type="button">🧠 Ezber modu</button><span class="small muted" id="wordCount"></span></div>
+      <div class="words" id="words"></div>
+    </div>
+    <div class="card">
+      <h2>Kendi keşiflerim <span class="de">Eigene Entdeckungen</span></h2>
+      <p class="small muted" style="margin:0">Listede olmayan bir yer mi buldun? Ekle, +15 XP kazan.</p>
+      <form class="custom" id="customForm">
+        <input class="field" id="cName" placeholder="Yerin adı (ör. köşedeki Türk fırını)" maxlength="80" required>
+        <select class="field" id="cType"><option value="gez">👀 Gezdim</option><option value="ye">🍽️ Yedim / içtim</option><option value="yap">🎯 Yaptım</option></select>
+        <textarea id="cNote" placeholder="Not (ne güzeldi, tekrar gider miyim?)" maxlength="400"></textarea>
+        <label class="opt"><input type="checkbox" id="cGps"> 📍 Konumumu kaydet</label>
+        <button class="btn good" type="submit">Keşfi ekle (+15 XP)</button>
+      </form>
+      <div class="quests" id="customList"></div>
+    </div>
+    <div class="card">
+      <h2>Yedek <span class="de">Sicherung</span></h2>
+      <p class="small muted" style="margin:0">Veriler sadece bu telefonda. Ara sıra yedek al.</p>
+      <div class="row">
+        <button class="btn sm" id="exportBtn" type="button">⬇️ Yedeği indir</button>
+        <label class="btn sm">⬆️ Yedeği yükle<input type="file" id="importFile" accept="application/json" hidden></label>
+        <button class="btn sm ghost" id="resetBtn" type="button">Sıfırla</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- HARİTA -->
+<div id="mapView" hidden>
+  <div id="map"></div>
+  <div class="map-ctrl">
+    <button type="button" id="locBtn" aria-label="Konumum">📍</button>
+    <button type="button" id="fitBtn" aria-label="Tüm Hamburg">🗺️</button>
+  </div>
+  <div class="map-legend" id="legend"></div>
+</div>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" data-tab="kesfet" aria-selected="true"><span class="e">🧭</span>Keşfet</button>
+  <button role="tab" data-tab="harita" aria-selected="false"><span class="e">🗺️</span>Harita</button>
+  <button role="tab" data-tab="takvim" aria-selected="false"><span class="e">📅</span>Takvim</button>
+  <button role="tab" data-tab="rozet" aria-selected="false"><span class="e">🏅</span>Rozetler</button>
+</nav>
+
+<script src="data.js"></script>
+<script>
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const today=()=>ymd(new Date());
+const AYLAR=["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+const fmtDate=s=>{const [y,m,d]=s.split("-").map(Number);return `${d} ${AYLAR[m-1]}`};
+const TYPE={gez:{e:"👀",tr:"Gez",de:"Sehen"},ye:{e:"🍽️",tr:"Ye",de:"Essen"},yap:{e:"🎯",tr:"Yap",de:"Erleben"},etk:{e:"🎡",tr:"Etkinlik",de:"Event"}};
+const TAGTR={free:"🆓 ücretsiz",rain:"☔ yağmurda",night:"🌙 akşam",view:"🗼 manzara",fisch:"🐟 balık",franz:"🥐 Franzbrötchen",klasik:"🍲 klasik",ferry:"⛴️ tekne",market:"🧺 pazar",museum:"🏛️ müze"};
+const regById=Object.fromEntries(REGIONS.map(r=>[r.id,r]));
+const qById=Object.fromEntries(QUESTS.map(q=>[q.id,q]));
+const evById=Object.fromEntries(EVENTS.map(e=>[e.id,e]));
+const itemById=id=>qById[id]||evById[id];
+const BONUS={gps:10,vlog:5,daily:15}, CUSTOM_XP=15;
+
+function haversine(a,b){const R=6371000,t=x=>x*Math.PI/180;const dLa=t(b[0]-a[0]),dLo=t(b[1]-a[1]);
+  const h=Math.sin(dLa/2)**2+Math.cos(t(a[0]))*Math.cos(t(b[0]))*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+const fmtDist=m=>m<1000?`${Math.round(m/10)*10} m`:`${(m/1000).toFixed(m<10000?1:0).replace(".",",")} km`;
+function toast(msg,ms=2600){const t=document.createElement("div");t.className="toast";t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),ms)}
+
+/* ---------- state ---------- */
+const KEY="hh-kesif-v1";
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.done)return {custom:[],seenRegions:[],seenLevel:0,...s}}catch{}return {done:{},custom:[],seenRegions:[],seenLevel:0}}
+let S=load();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}}
+let here=null; // last known position [lat,lng]
+
+const recXp=(id,r)=>{const it=itemById(id);if(!it)return 0;return it.xp+(r.gps?BONUS.gps:0)+(r.vlog?BONUS.vlog:0)+(r.daily?BONUS.daily:0)};
+function totalXp(){let x=0;for(const [id,r] of Object.entries(S.done))x+=recXp(id,r);return x+S.custom.length*CUSTOM_XP}
+function levelOf(xp){let i=0;LEVELS.forEach((l,k)=>{if(xp>=l.xp)i=k});return i}
+const unlocked=(r,xp=totalXp())=>xp>=r.xp;
+const regQuests=rid=>QUESTS.filter(q=>q.r===rid);
+const isDone=id=>!!S.done[id];
+
+/* week streak: consecutive ISO weeks (ending this or last week) with at least one completion */
+function weekKey(d){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);
+  const y=new Date(Date.UTC(t.getUTCFullYear(),0,1));return t.getUTCFullYear()*100+Math.ceil(((t-y)/864e5+1)/7)}
+function streak(){
+  const weeks=new Set([...Object.values(S.done).map(r=>r.at),...S.custom.map(c=>c.at)].filter(Boolean).map(s=>weekKey(new Date(s+"T12:00"))));
+  let d=new Date(),n=0;if(!weeks.has(weekKey(d)))d.setDate(d.getDate()-7);
+  while(weeks.has(weekKey(d))){n++;d.setDate(d.getDate()-7)}return n}
+
+function stats(){
+  const done=Object.keys(S.done);const items=done.map(itemById).filter(Boolean);
+  const tag={};items.forEach(it=>(it.tags||[]).forEach(t=>tag[t]=(tag[t]||0)+1));
+  const xp=totalXp();
+  return {xp,tag,
+    chef:items.filter(i=>i.chef).length,
+    events:done.filter(id=>evById[id]).length,
+    gps:Object.values(S.done).filter(r=>r.gps).length+S.custom.filter(c=>c.ll).length,
+    vlog:Object.values(S.done).filter(r=>r.vlog).length,
+    words:items.filter(i=>i.ph).length,
+    region:REGIONS.filter(r=>{const qs=regQuests(r.id);return qs.length&&qs.every(q=>isDone(q.id))}).length,
+    streak:streak(),
+    trips:done.filter(id=>qById[id]?.r==="ausflug").length,
+    allregions:REGIONS.filter(r=>unlocked(r,xp)).length};
+}
+function badgeProgress(b,st){const v=b.tag?(st.tag[b.tag]||0):st[b.special];return [Math.min(v,b.goal),b.goal]}
+
+/* daily quest: deterministic pick per day among open, unfinished city quests */
+function dailyQuest(){
+  const xp=totalXp(),d=today();
+  if(S.dailyPick&&S.dailyPick.d===d&&qById[S.dailyPick.id])return qById[S.dailyPick.id];
+  const pool=QUESTS.filter(q=>q.r!=="ausflug"&&unlocked(regById[q.r],xp)&&!isDone(q.id)&&(!q.months||q.months.includes(new Date().getMonth()+1)));
+  if(!pool.length)return null;
+  let h=0;for(const c of d)h=(h*31+c.charCodeAt(0))>>>0;
+  const q=pool[h%pool.length];S.dailyPick={d,id:q.id};save();return q;
+}
+
+/* ---------- render: home ---------- */
+let mood="all";
+const MOODS=[["all","✨ Hepsi"],["near","📍 Yakınımda"],["free","🆓 Bedava"],["rain","☔ Yağmurlu gün"],["night","🌙 Akşam"],["ye","🍽️ Acıktım"],["view","🗼 Manzara"]];
+
+function renderPlayer(){
+  const xp=totalXp(),li=levelOf(xp),L=LEVELS[li],N=LEVELS[li+1];
+  const pct=N?Math.round((xp-L.xp)/(N.xp-L.xp)*100):100;
+  const st=stats();
+  const nDone=Object.keys(S.done).length+S.custom.length;
+  $("player").innerHTML=`
+    <div class="lv">${esc(L.n)}<small>Seviye ${li+1} · ${esc(L.tr)}</small></div>
+    <div class="xpbar"><i style="width:${pct}%"></i></div>
+    <div class="xptext num"><span>${xp} XP</span><span>${N?`${N.n} için ${N.xp-xp} XP`:"Zirvedesin 👑"}</span></div>
+    <div class="pstats num">
+      <div><b>${nDone}</b><span>keşif</span></div>
+      <div><b>${st.allregions}/${REGIONS.length}</b><span>bölge</span></div>
+      <div><b>${BADGES.filter(b=>{const [v,g]=badgeProgress(b,st);return v>=g}).length}</b><span>rozet</span></div>
+      <div><b>${st.streak}🔥</b><span>hafta seri</span></div>
+    </div>`;
+  $("lvlChip").textContent=`Lv ${li+1} · ${xp} XP`;
+}
+function renderDaily(){
+  const q=dailyQuest(),box=$("daily");
+  if(!q){box.innerHTML="";return}
+  const rec=S.done[q.id];const r=regById[q.r];
+  box.innerHTML=`<div class="daily${rec?" done":""}" role="button" tabindex="0">
+    <span class="tag">⭐ Günün görevi · bugün yaparsan +${BONUS.daily} XP</span>
+    <div class="t">${TYPE[q.t].e} ${esc(q.n)}</div>
+    <div class="small muted">${esc(r.n)} · ${q.xp} XP${rec?" · ✅ tamamlandı":""}</div></div>`;
+  box.firstElementChild.onclick=()=>openItem(q.id);
+}
+function renderRegions(){
+  const xp=totalXp();let nextShown=false;
+  $("regions").innerHTML=REGIONS.map(r=>{
+    const qs=regQuests(r.id),dn=qs.filter(q=>isDone(q.id)).length;
+    if(unlocked(r,xp)){
+      const isNew=!S.seenRegions.includes(r.id);
+      return `<button class="region${dn===qs.length?" complete":""}${isNew?" new":""}" style="--rc:${r.c}" data-r="${r.id}">
+        <div class="top"><span class="nm">${esc(r.n)}</span><span class="cnt num">${dn===qs.length?"🏁 ":""}${dn}/${qs.length}</span></div>
+        <p class="d">${esc(r.d)}</p>
+        <div class="track"><i style="width:${Math.round(dn/qs.length*100)}%"></i></div></button>`;
+    }
+    const first=!nextShown;nextShown=true;
+    return `<div class="region locked" style="--rc:${r.c}">
+      <div class="top"><span class="nm">🔒 ${esc(r.n)}</span><span class="cnt num">${r.xp} XP</span></div>
+      ${first?`<p class="d">Açılmasına ${r.xp-xp} XP kaldı · ${qs.length} görev seni bekliyor</p><div class="track"><i style="width:${Math.round(xp/r.xp*100)}%"></i></div>`:`<p class="d">${qs.length} görev · gizli</p>`}
+    </div>`;
+  }).join("");
+  $("regions").querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>openRegion(b.dataset.r));
+}
+function questRow(q,showReg=false){
+  const rec=S.done[q.id],r=regById[q.r];
+  const dist=here?` · <span class="dist">${fmtDist(haversine(here,q.ll))}</span>`:"";
+  const tags=(q.tags||[]).slice(0,3).map(t=>TAGTR[t]).filter(Boolean).join(" · ");
+  return `<button class="q${rec?" done":""}" data-q="${q.id}">
+    <span class="ico">${rec?"✓":TYPE[q.t].e}</span>
+    <span><span class="nm">${esc(q.n)}</span><span class="meta">${showReg?`<span>${esc(r.de)}</span>`:""}${tags?`<span>${tags}</span>`:""}${dist}</span></span>
+    <span class="xp num">${rec?"+"+recXp(q.id,rec):q.xp} XP</span></button>`;
+}
+function bindRows(root){root.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>openItem(b.dataset.q))}
+
+function renderMood(){
+  $("moodChips").innerHTML=MOODS.map(([k,l])=>`<button class="chip" aria-pressed="${mood===k}" data-m="${k}">${l}</button>`).join("");
+  $("moodChips").querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{mood=b.dataset.m;if(mood==="near"&&!here){locate(()=>renderMood(),true)}renderMood()});
+  const xp=totalXp(),m=new Date().getMonth()+1;
+  let list=QUESTS.filter(q=>unlocked(regById[q.r],xp)&&!isDone(q.id)&&(!q.months||q.months.includes(m)));
+  if(mood==="near"){
+    if(!here){$("moodList").innerHTML=`<div class="empty">Konumun alınıyor… (izin vermen gerekiyor)</div>`;return}
+    list=list.filter(q=>q.r!=="ausflug").sort((a,b)=>haversine(here,a.ll)-haversine(here,b.ll));
+  }else if(mood==="ye")list=list.filter(q=>q.t==="ye");
+  else if(mood!=="all")list=list.filter(q=>(q.tags||[]).includes(mood));
+  else list=[...list].sort((a,b)=>a.r===b.r?0:REGIONS.findIndex(r=>r.id===a.r)-REGIONS.findIndex(r=>r.id===b.r));
+  list=list.slice(0,8);
+  $("moodList").innerHTML=list.length?list.map(q=>questRow(q,true)).join(""):`<div class="empty">Açık bölgelerde bu filtreye uyan görev kalmadı. Yeni bölge aç! 🔓</div>`;
+  bindRows($("moodList"));
+}
+
+/* ---------- region view ---------- */
+let curRegion=null,regFilter="all";
+function openRegion(id){
+  curRegion=id;regFilter="all";
+  if(!S.seenRegions.includes(id)){S.seenRegions.push(id);save()}
+  $("homeView").hidden=true;$("regionView").hidden=false;renderRegion();window.scrollTo(0,0);
+}
+function closeRegion(){curRegion=null;$("regionView").hidden=true;$("homeView").hidden=false;renderHome()}
+function renderRegion(){
+  const r=regById[curRegion];if(!r)return;
+  const qs=regQuests(r.id),dn=qs.filter(q=>isDone(q.id)).length;
+  const F=[["all","Hepsi"],["gez","👀 Gez"],["ye","🍽️ Ye"],["yap","🎯 Yap"],["todo","Yapılmadı"]];
+  let list=qs;
+  if(regFilter==="todo")list=qs.filter(q=>!isDone(q.id));else if(regFilter!=="all")list=qs.filter(q=>q.t===regFilter);
+  if(here&&r.id!=="ausflug")list=[...list].sort((a,b)=>haversine(here,a.ll)-haversine(here,b.ll));
+  $("regionView").innerHTML=`
+    <button class="back" id="backBtn" type="button">‹ Bölgeler</button>
+    <div class="rhead" style="--rc:${r.c}">
+      <h2>${esc(r.n)}</h2><p>${esc(r.d)}</p>
+      <div class="track"><i style="width:${Math.round(dn/qs.length*100)}%"></i></div>
+      <p class="num">${dn}/${qs.length} tamamlandı${dn===qs.length?" · 🏁 Bölge fethedildi!":""}</p>
+    </div>
+    <div class="chips">${F.map(([k,l])=>`<button class="chip" aria-pressed="${regFilter===k}" data-f="${k}">${l}</button>`).join("")}</div>
+    <div class="quests">${list.map(q=>questRow(q)).join("")||'<div class="empty">Burada hepsi bitti 👏</div>'}</div>`;
+  $("backBtn").onclick=closeRegion;
+  $("regionView").querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{regFilter=b.dataset.f;renderRegion()});
+  bindRows($("regionView"));
+}
+
+/* ---------- item sheet (quest or event) ---------- */
+let sheetEl=null;
+function closeSheet(){sheetEl?.remove();sheetEl=null;document.body.style.overflow=""}
+function mapsLinks(it,r){
+  const q=encodeURIComponent(it.n.replace(/ —.*$/,"").replace(/\(.*?\)/g,"").trim()+(r&&r.id==="ausflug"?"":" Hamburg"));
+  return `<a class="btn sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${it.ll[0]},${it.ll[1]}&travelmode=transit">🚆 Yol tarifi</a>
+    <a class="btn sm" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${q}">🔎 Haritada ara</a>`;
+}
+function evWhen(e){
+  if(e.ranges)return e.ranges.map(([a,b])=>a===b?fmtDate(a):`${fmtDate(a)} – ${fmtDate(b)} ${b.slice(0,4)}`).join(", ");
+  return "Her yıl: "+e.months.map(m=>AYLAR[m-1]).join(", ");
+}
+function openItem(id){
+  const it=itemById(id);if(!it)return;
+  const isEv=!!evById[id],r=isEv?null:regById[it.r];
+  if(r&&!unlocked(r)){toast(`🔒 ${r.n} ${r.xp} XP'de açılır`);return}
+  closeSheet();
+  const rec=S.done[id];const type=isEv?TYPE.etk:TYPE[it.t];
+  const dq=dailyQuest();const isDaily=dq&&dq.id===id;
+  const sc=document.createElement("div");sc.className="scrim";
+  sc.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(it.n)}">
+    <div class="grab"></div>
+    <div class="row">
+      ${r?`<span class="pill reg" style="--rc:${r.c}">${esc(r.n)}</span>`:`<span class="pill">📅 ${esc(evWhen(it))}</span>`}
+      <span class="pill">${type.e} ${type.tr} <span class="de">${type.de}</span></span>
+      <span class="pill xp">+${it.xp} XP</span>
+      ${isDaily?`<span class="pill xp">⭐ Günün görevi +${BONUS.daily}</span>`:""}
+    </div>
+    <h3 class="title">${esc(it.n)}</h3>
+    ${(it.tags||[]).length?`<div class="row">${it.tags.map(t=>TAGTR[t]?`<span class="pill">${TAGTR[t]}</span>`:"").join("")}</div>`:""}
+    <div class="block"><span class="lbl">Neden?</span><p>${esc(it.why||it.d)}</p></div>
+    ${it.tip?`<div class="block"><span class="lbl">İpucu</span><p>${esc(it.tip)}</p></div>`:""}
+    ${it.chef?`<div class="block chef"><span class="lbl">👨‍🍳 Aşçı notu</span><p>${esc(it.chef)}</p></div>`:""}
+    ${it.pork?`<div class="block pork"><span class="lbl">🐷 Domuz uyarısı</span><p>${esc(it.pork)}</p></div>`:""}
+    ${it.ph?`<div class="block de-ph"><span class="lbl">🗣️ Almanca cümle</span><span class="de-t">${esc(it.ph[0])}</span><span class="muted small">${esc(it.ph[1])}</span>
+      <button class="speak" type="button" data-say="${esc(it.ph[0])}">🔊 Dinle</button></div>`:""}
+    ${it.film?`<div class="block film"><span class="lbl">🎥 Vlog fikri</span><p>${esc(it.film)}</p></div>`:""}
+    <div class="row">${mapsLinks(it,r)}</div>
+    <div id="sheetAction"></div>
+  </div>`;
+  sc.addEventListener("click",e=>{if(e.target===sc)closeSheet()});
+  document.body.appendChild(sc);document.body.style.overflow="hidden";sheetEl=sc;
+  sc.querySelector("[data-say]")?.addEventListener("click",e=>say(e.currentTarget.dataset.say));
+  renderAction(id,isDaily);
+}
+function renderAction(id,isDaily){
+  const box=sheetEl.querySelector("#sheetAction"),it=itemById(id),rec=S.done[id];
+  if(rec){
+    box.innerHTML=`<div class="donebox">
+      <b>✅ ${fmtDate(rec.at)} ${rec.at.slice(0,4)} tarihinde tamamlandı · +${recXp(id,rec)} XP</b>
+      <span class="small">${rec.gps?"📍 konum doğrulandı · ":""}${rec.vlog?"🎥 videoya çekildi · ":""}${rec.daily?"⭐ günün görevi · ":""}${rec.stars?"★".repeat(rec.stars):""}</span>
+      ${rec.note?`<p style="margin:0">“${esc(rec.note)}”</p>`:""}
+      <button class="btn sm ghost" id="undoBtn" type="button" style="justify-self:start">↩︎ Geri al</button></div>`;
+    box.querySelector("#undoBtn").onclick=()=>{if(!confirm("Bu görevi geri almak istiyor musun? XP düşer."))return;delete S.done[id];save();closeSheet();renderAll()};
+    return;
+  }
+  if(evById[id]){const st=evStatus(it);if(st.state==="later"){box.innerHTML=`<div class="block"><p>⏳ Bu etkinlik şu an yok — ${esc(st.label)}. O zaman gel!</p></div>`;return}}
+  let stars=0,gps=null;
+  box.innerHTML=`<div class="complete">
+    <b>Yaptın mı? Kaydet!</b>
+    <button class="btn sm" id="gpsBtn" type="button" style="justify-self:start">📍 Konumumu doğrula (+${BONUS.gps} XP)</button>
+    <span class="gpsres" id="gpsRes"></span>
+    <label class="opt"><input type="checkbox" id="vlogChk"> 🎥 Videoya çektim (+${BONUS.vlog} XP)</label>
+    <div class="stars" id="stars">${[1,2,3,4,5].map(n=>`<button type="button" data-s="${n}" aria-label="${n} yıldız">⭐</button>`).join("")}</div>
+    <textarea id="noteIn" placeholder="Not: nasıldı? Ne yedin? Tekrar gelir misin?" maxlength="400"></textarea>
+    <button class="btn good" id="doneBtn" type="button">✓ Tamamladım (+${it.xp}${isDaily?` +${BONUS.daily}`:""} XP)</button>
+  </div>`;
+  box.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{stars=+b.dataset.s;box.querySelectorAll("[data-s]").forEach(x=>x.classList.toggle("on",+x.dataset.s<=stars))});
+  box.querySelector("#gpsBtn").onclick=()=>{
+    const res=box.querySelector("#gpsRes");res.className="gpsres";res.textContent="Konum alınıyor…";
+    locate(pos=>{
+      const d=haversine(pos,it.ll),rad=it.rad||400;
+      if(d<=rad){gps=true;res.className="gpsres ok";res.textContent=`✓ Buradasın! (${fmtDist(d)}) +${BONUS.gps} XP`}
+      else{gps=false;res.className="gpsres far";res.textContent=`Hedefe ${fmtDist(d)} uzaktasın. Yine de kaydedebilirsin, bonus olmadan.`}
+    },false,err=>{res.className="gpsres far";res.textContent=err});
+  };
+  box.querySelector("#doneBtn").onclick=()=>{
+    const before=snapshot();
+    S.done[id]={at:today(),gps:!!gps,vlog:box.querySelector("#vlogChk").checked,stars,note:box.querySelector("#noteIn").value.trim(),daily:!!isDaily};
+    save();closeSheet();celebrate(id,before);renderAll();
+  };
+}
+function say(text){
+  try{const u=new SpeechSynthesisUtterance(text);u.lang="de-DE";u.rate=.9;const v=speechSynthesis.getVoices().find(v=>v.lang.startsWith("de"));if(v)u.voice=v;speechSynthesis.cancel();speechSynthesis.speak(u)}
+  catch{toast("Bu cihazda sesli okuma yok")}
+}
+
+/* ---------- geolocation ---------- */
+function locate(cb,silent,onErr){
+  if(!navigator.geolocation){onErr?onErr("Bu cihaz konum desteklemiyor"):toast("Konum desteklenmiyor");return}
+  navigator.geolocation.getCurrentPosition(p=>{here=[p.coords.latitude,p.coords.longitude];cb(here)},
+    e=>{const m=e.code===1?"Konum izni verilmedi (Ayarlar → Safari → Konum)":"Konum alınamadı, tekrar dene";onErr?onErr(m):toast(m);if(mood==="near"){mood="all";renderMood()}},
+    {enableHighAccuracy:true,timeout:15000,maximumAge:60000});
+}
+
+/* ---------- celebrations ---------- */
+function snapshot(){const xp=totalXp();return {xp,lvl:levelOf(xp),regs:REGIONS.filter(r=>unlocked(r,xp)).map(r=>r.id),
+  badges:BADGES.filter(b=>{const [v,g]=badgeProgress(b,stats());return v>=g}).map(b=>b.id)}}
+function celebrate(id,before){
+  const after=snapshot(),gain=after.xp-before.xp;
+  const newRegs=after.regs.filter(r=>!before.regs.includes(r)).map(r=>regById[r]);
+  const newBadges=after.badges.filter(b=>!before.badges.includes(b)).map(b=>BADGES.find(x=>x.id===b));
+  const lvlUp=after.lvl>before.lvl;
+  const it=id?itemById(id):null;
+  let big="🎉",h="Harika!",body="";
+  if(newRegs.length){big="🔓";h="Yeni bölge açıldı!";body=newRegs.map(r=>`<b style="color:${r.c}">${esc(r.n)}</b><br><span class="small muted">${esc(r.d)}</span>`).join("<br>")}
+  else if(lvlUp){big="⬆️";h="Seviye atladın!"}
+  if(lvlUp)body+=`<div><b>${esc(LEVELS[after.lvl].n)}</b> <span class="small muted">· ${esc(LEVELS[after.lvl].tr)}</span></div>`;
+  if(newBadges.length)body+=newBadges.map(b=>`<div>${b.ic} Yeni rozet: <b>${esc(b.n)}</b></div>`).join("");
+  if(it?.ph)body+=`<div class="small">🗣️ Defterine eklendi: <i>${esc(it.ph[0])}</i></div>`;
+  const c=document.createElement("div");c.className="celebrate";
+  c.innerHTML=`<div class="box"><div class="big">${big}</div><div class="h">${h}</div><div class="xpgain num">+${gain} XP</div>${body}<button class="btn primary" type="button">Devam</button></div>`;
+  c.onclick=e=>{if(e.target===c||e.target.tagName==="BUTTON")c.remove()};
+  document.body.appendChild(c);
+  if(newRegs.length||lvlUp||newBadges.length)confetti();
+}
+function confetti(){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const cols=["#c8102e","#1f5f8b","#e8b84a","#2b9a66","#ffffff"];
+  for(let i=0;i<60;i++){const s=document.createElement("i");s.className="confetti";s.style.left=Math.random()*100+"vw";s.style.background=cols[i%cols.length];
+    s.style.animationDuration=(1.6+Math.random()*1.6)+"s";s.style.animationDelay=Math.random()*.4+"s";document.body.appendChild(s);setTimeout(()=>s.remove(),3800)}
+}
+
+/* ---------- calendar ---------- */
+function evStatus(e,now=new Date()){
+  const t=ymd(now),m=now.getMonth()+1;
+  if(e.ranges){
+    for(const [a,b] of e.ranges){if(t>=a&&t<=b){const left=Math.round((new Date(b+"T12:00")-new Date(t+"T12:00"))/864e5);return {state:"live",label:left?`${left} gün kaldı`:"son gün!",sort:0}}}
+    const nx=e.ranges.find(([a])=>a>t);
+    if(nx){const days=Math.round((new Date(nx[0]+"T12:00")-new Date(t+"T12:00"))/864e5);return {state:days<=45?"soon":"later",label:`${days} gün sonra`,sort:days}}
+    return {state:"past",label:"bitti",sort:9999};
+  }
+  if(e.months.includes(m))return {state:"live",label:"bu ay",sort:0};
+  let k=1;while(k<=12&&!e.months.includes(((m-1+k)%12)+1))k++;
+  return {state:k<=1?"soon":"later",label:`${AYLAR[((m-1+k)%12)]} ayında`,sort:k*30};
+}
+function evCard(e){
+  const st=evStatus(e),done=isDone(e.id);
+  return `<button class="ev${st.state==="live"?" live":""}${done?" done":""}" data-e="${e.id}">
+    <div class="top"><span class="nm">${done?"✅ ":""}${esc(e.n)}</span>${st.state==="live"?`<span class="badge-live">ŞU AN · ${esc(st.label)}</span>`:st.state==="soon"?`<span class="badge-soon">${esc(st.label)}</span>`:`<span class="when">${esc(st.label)}</span>`}</div>
+    <span class="when">${esc(evWhen(e))} · +${e.xp} XP</span>
+    <span class="small muted">${esc(e.d.length>120?e.d.slice(0,118)+"…":e.d)}</span></button>`;
+}
+function renderCalendar(){
+  const evs=EVENTS.map(e=>({e,st:evStatus(e)})).filter(x=>x.st.state!=="past");
+  const live=evs.filter(x=>x.st.state==="live"),next=evs.filter(x=>x.st.state!=="live").sort((a,b)=>a.st.sort-b.st.sort);
+  $("evNow").innerHTML=`<h3>Şu an <span class="de">Jetzt</span></h3>`+(live.map(x=>evCard(x.e)).join("")||'<div class="empty">Şu an süren etkinlik yok.</div>');
+  $("evNext").innerHTML=`<h3>Yaklaşanlar <span class="de">Demnächst</span></h3>`+next.map(x=>evCard(x.e)).join("");
+  document.querySelectorAll("[data-e]").forEach(b=>b.onclick=()=>openItem(b.dataset.e));
+  const wd=new Date().getDay(); // 0 Sun
+  const until=d=>{const n=(d-wd+7)%7;return n===0?"BUGÜN":n===1?"yarın":`${n} gün sonra`};
+  const W=[["Fischmarkt (Pazar sabahı)",0,"fischmarkt"],["Isemarkt (Salı)",2,"isemarkt"],["Isemarkt (Cuma)",5,"isemarkt"],["Flohschanze bit pazarı (Cumartesi)",6,"flohschanze"]];
+  $("weekly").innerHTML=W.map(([n,d,q])=>`<div><span>${esc(n)}${isDone(q)?" ✅":""}</span><b class="small">${until(d)}</b></div>`).join("");
+}
+
+/* ---------- badges, levels, words, custom ---------- */
+let quiz=false;
+function renderBadges(){
+  const st=stats(),xp=st.xp,li=levelOf(xp);
+  $("badges").innerHTML=BADGES.map(b=>{const [v,g]=badgeProgress(b,st);const got=v>=g;
+    return `<div class="bdg${got?" got":""}"><span class="i">${b.ic}</span><span class="n">${esc(b.n)}</span><span class="d">${esc(b.d)}</span><span class="p num">${got?"✓ kazanıldı":`${v}/${g}`}</span></div>`}).join("");
+  $("levels").innerHTML=LEVELS.map((l,i)=>`<div class="${i===li?"cur":i<li?"past":""}"><span>${i+1}. ${esc(l.n)} <span class="small muted">${esc(l.tr)}</span></span><span class="num">${l.xp} XP</span></div>`).join("");
+  const words=Object.entries(S.done).sort((a,b)=>b[1].at.localeCompare(a[1].at)).map(([id])=>itemById(id)).filter(i=>i&&i.ph);
+  const totalPh=QUESTS.filter(q=>q.ph).length+EVENTS.filter(e=>e.ph).length;
+  $("wordCount").textContent=`${words.length}/${totalPh} cümle`;
+  $("words").className="words"+(quiz?" quiz":"");
+  $("words").innerHTML=words.map(i=>`<div class="word"><b>${esc(i.ph[0])}</b><span>${esc(i.ph[1])}</span></div>`).join("")||'<div class="empty">İlk görevini bitir, ilk cümlen buraya gelsin.</div>';
+  $("words").querySelectorAll(".word").forEach(w=>w.onclick=()=>{if(quiz)w.classList.toggle("show");else say(w.querySelector("b").textContent)});
+  $("customList").innerHTML=S.custom.slice().reverse().map(c=>`<div class="q done" style="cursor:default"><span class="ico">${TYPE[c.t].e}</span>
+    <span><span class="nm">${esc(c.n)}</span><span class="meta"><span>${fmtDate(c.at)}</span>${c.note?`<span>${esc(c.note)}</span>`:""}${c.ll?`<a href="https://www.google.com/maps/search/?api=1&query=${c.ll[0]},${c.ll[1]}" target="_blank" rel="noopener">📍 konum</a>`:""}</span></span>
+    <button class="btn sm ghost" data-del="${c.id}" type="button" aria-label="Sil">✕</button></div>`).join("");
+  $("customList").querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{if(!confirm("Bu keşfi silmek istiyor musun?"))return;S.custom=S.custom.filter(c=>c.id!==b.dataset.del);save();renderAll()});
+}
+$("quizBtn").onclick=()=>{quiz=!quiz;$("quizBtn").textContent=quiz?"👀 Hepsini göster":"🧠 Ezber modu";renderBadges()};
+$("customForm").addEventListener("submit",e=>{
+  e.preventDefault();const n=$("cName").value.trim();if(!n)return;
+  const add=ll=>{const before=snapshot();S.custom.push({id:"c"+Date.now(),n,t:$("cType").value,note:$("cNote").value.trim(),at:today(),ll:ll||null});save();
+    $("customForm").reset();celebrate(null,before);renderAll()};
+  if($("cGps").checked)locate(p=>add([+p[0].toFixed(5),+p[1].toFixed(5)]),false,m=>{toast(m);add(null)});else add(null);
+});
+$("exportBtn").onclick=()=>{
+  const blob=new Blob([JSON.stringify(S,null,1)],{type:"application/json"});const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);a.download=`hamburg-kesif-${today()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+};
+$("importFile").onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{const d=JSON.parse(await f.text());if(!d||typeof d.done!=="object")throw 0;S={custom:[],seenRegions:[],seenLevel:0,...d};save();renderAll();toast("Yedek yüklendi ✓")}
+  catch{toast("Bu dosya geçerli bir yedek değil")}e.target.value="";
+};
+$("resetBtn").onclick=()=>{if(!confirm("Tüm ilerleme silinsin mi? Önce yedek almanı öneririm."))return;if(!confirm("Emin misin? Geri alınamaz."))return;S={done:{},custom:[],seenRegions:[],seenLevel:0};save();renderAll()};
+$("lvlChip").onclick=()=>switchTab("rozet");
+
+/* ---------- map (Leaflet, lazy) ---------- */
+let map=null,mapLayers=null,meMarker=null;
+function loadLeaflet(){
+  return new Promise((res,rej)=>{
+    if(window.L)return res();
+    const css=document.createElement("link");css.rel="stylesheet";css.href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";document.head.appendChild(css);
+    const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";s.onload=()=>window.L?res():rej();s.onerror=rej;document.head.appendChild(s);
+  });
+}
+async function showMap(){
+  try{await loadLeaflet()}catch{$("map").innerHTML='<div class="map-msg">Harita için internet lazım. Bağlanınca tekrar dene.</div>';return}
+  if(!map){
+    map=L.map("map",{zoomControl:false,attributionControl:true}).setView([53.5500,9.9800],13);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
+    L.control.zoom({position:"bottomright"}).addTo(map);
+    mapLayers=L.layerGroup().addTo(map);
+  }
+  setTimeout(()=>map.invalidateSize(),50);
+  drawMap();
+}
+function drawMap(){
+  if(!map)return;mapLayers.clearLayers();const xp=totalXp();
+  REGIONS.filter(r=>r.id!=="ausflug").forEach(r=>{
+    const open=unlocked(r,xp);const qs=regQuests(r.id);
+    const pts=qs.map(q=>q.ll);const lat=pts.reduce((a,p)=>a+p[0],0)/pts.length,lng=pts.reduce((a,p)=>a+p[1],0)/pts.length;
+    // circle covers the core of the region; far-out quests (e.g. Ohlsdorf) stay outside rather than blowing it up
+    const ds=pts.map(p=>haversine([lat,lng],p)).sort((a,b)=>a-b);
+    const rad=Math.min(1800,Math.max(400,ds[Math.floor(ds.length*.6)]+250));
+    L.circle([lat,lng],{radius:rad,color:open?r.c:"#6b7480",weight:open?2:1.5,dashArray:open?null:"6 6",fillColor:open?r.c:"#6b7480",fillOpacity:open?.06:.22}).addTo(mapLayers)
+      .bindTooltip(open?r.n:`🔒 ${r.xp} XP`,{direction:"center",permanent:!open,className:open?"":"lock-label"});
+    if(!open)L.circle([lat,lng],{radius:rad,stroke:false,fillOpacity:0}).addTo(mapLayers).bindPopup(`🔒 <b>${esc(r.n)}</b><br>${r.xp} XP'de açılır · ${qs.length} gizli görev`);
+    if(!open)return;
+    qs.forEach(q=>{
+      const d=isDone(q.id);
+      L.circleMarker(q.ll,{radius:d?7:8,color:"#fff",weight:2,fillColor:d?"#1d8a5a":r.c,fillOpacity:1}).addTo(mapLayers)
+        .bindTooltip(`${d?"✅":TYPE[q.t].e} ${q.n}`).on("click",()=>openItem(q.id));
+    });
+  });
+  EVENTS.filter(e=>evStatus(e).state==="live"&&haversine([53.55,9.99],e.ll)<20000).forEach(e=>{
+    L.circleMarker(e.ll,{radius:10,color:"#e8b84a",weight:3,fillColor:"#c8102e",fillOpacity:1}).addTo(mapLayers).bindTooltip("🎡 "+e.n).on("click",()=>openItem(e.id));
+  });
+  if(here){meMarker=L.circleMarker(here,{radius:8,color:"#fff",weight:3,fillColor:"#2a7fff",fillOpacity:1}).addTo(mapLayers).bindTooltip("Sen buradasın")}
+  const open=REGIONS.filter(r=>unlocked(r,xp)).length;
+  $("legend").innerHTML=`<span><i class="dot" style="background:var(--accent)"></i>Yapılacak</span><span><i class="dot" style="background:#1d8a5a"></i>Tamamlandı</span><span>🔒 Kilitli bölge · ${open}/${REGIONS.length} açık</span>`;
+}
+$("locBtn").onclick=()=>locate(p=>{drawMap();map&&map.setView(p,15)});
+$("fitBtn").onclick=()=>map&&map.setView([53.5500,9.9800],13);
+
+/* ---------- tabs ---------- */
+let tab="kesfet";
+function switchTab(t){
+  tab=t;closeSheet();
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
+  $("app").hidden=t==="harita";$("mapView").hidden=t!=="harita";
+  document.querySelectorAll(".tab").forEach(s=>s.hidden=s.id!=="tab-"+t);
+  if(t==="harita")showMap();else{renderAll();window.scrollTo(0,0)}
+  try{sessionStorage.setItem("hh-tab",t)}catch{}
+}
+document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>{if(b.dataset.tab==="kesfet"&&tab==="kesfet"&&curRegion)closeRegion();switchTab(b.dataset.tab)});
+
+function renderHome(){renderPlayer();renderDaily();renderRegions();renderMood()}
+function renderAll(){
+  renderPlayer();
+  if(curRegion)renderRegion();else{renderDaily();renderRegions();renderMood()}
+  renderCalendar();renderBadges();drawMap();
+}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(document.querySelector(".celebrate"))document.querySelector(".celebrate").remove();else closeSheet()}});
+
+/* ---------- boot ---------- */
+renderAll();
+try{const t=sessionStorage.getItem("hh-tab");if(t&&t!=="kesfet")switchTab(t)}catch{}
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>
